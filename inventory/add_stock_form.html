@@ -1,0 +1,88 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Add New Stock{% endblock %}
+{% block admin_content %}
+<div class="container py-4">
+  <h2 class="mb-4">Add New Stock (Purchase)</h2>
+  <form method="POST" enctype="multipart/form-data" class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label" for="supplier_id">Supplier</label>
+      <select class="form-select" name="supplier_id" id="supplier_id" required>
+        <option value="" disabled selected>Select supplier</option>
+        {% for sup in suppliers %}
+          <option value="{{ sup.id }}">{{ sup.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label" for="purchase_date">Purchase Date</label>
+      <input type="date" class="form-control" name="purchase_date" id="purchase_date" value="{{ today.strftime('%Y-%m-%d') if today else '' }}" required>
+    </div>
+    <div class="col-12">
+      <label class="form-label" for="challan_pdf">Challan PDF (optional)</label>
+      <input type="file" class="form-control" name="challan_pdf" id="challan_pdf" accept="application/pdf">
+    </div>
+    <hr class="my-4">
+    <h5>Items</h5>
+    <table class="table table-sm" id="items-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th>CGST %</th>
+          <th>SGST %</th>
+          <th>Discount</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <select class="form-select" name="item_id[]" required>
+              <option value="" disabled selected>Select item</option>
+              {% for itm in items %}
+                <option value="{{ itm.id }}">{{ itm.item_name }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
+          <td><input type="number" step="0.01" class="form-control" name="rate[]" min="0" required></td>
+          <td><input type="number" step="0.01" class="form-control" name="cgst_rate[]" min="0"></td>
+          <td><input type="number" step="0.01" class="form-control" name="sgst_rate[]" min="0"></td>
+          <td><input type="number" step="0.01" class="form-control" name="discount[]" min="0"></td>
+          <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove();">✕</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="col-12 text-end">
+      <button type="button" class="btn btn-outline-primary btn-sm" id="add-row">Add Another Item</button>
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" class="btn btn-primary">Save Purchase</button>
+    </div>
+  </form>
+</div>
+<script>
+  document.getElementById('add-row').addEventListener('click', function(){
+    const tbody = document.querySelector('#items-table tbody');
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td>
+        <select class="form-select" name="item_id[]" required>
+          <option value="" disabled selected>Select item</option>
+          {% for itm in items %}
+            <option value="{{ itm.id }}">{{ itm.item_name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+      <td><input type="number" class="form-control" name="quantity[]" min="1" required></td>
+      <td><input type="number" step="0.01" class="form-control" name="rate[]" min="0" required></td>
+      <td><input type="number" step="0.01" class="form-control" name="cgst_rate[]" min="0"></td>
+      <td><input type="number" step="0.01" class="form-control" name="sgst_rate[]" min="0"></td>
+      <td><input type="number" step="0.01" class="form-control" name="discount[]" min="0"></td>
+      <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove();">✕</button></td>
+    `;
+    tbody.appendChild(newRow);
+  });
+</script>
+{% endblock %}

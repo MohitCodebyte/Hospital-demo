@@ -1,0 +1,30 @@
+{% extends 'admin/layout.html' %}
+{% block content %}
+<h2>Invoice {{ invoice.invoice_number }}</h2>
+<p>Date: {{ invoice.invoice_date }}</p>
+<p>Patient: {{ invoice.patient.full_name }}</p>
+<table class="table table-striped">
+  <thead><tr><th>Item</th><th>Type</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+  <tbody>
+  {% for item in invoice.items %}
+    <tr>
+      <td>{{ item.item_name }}</td>
+      <td>{{ item.item_type }}</td>
+      <td>{{ item.quantity }}</td>
+      <td>{{ '{:.2f}'.format(item.unit_price) }}</td>
+      <td>{{ '{:.2f}'.format(item.total_price) }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p>Subtotal: {{ '{:.2f}'.format(invoice.subtotal) }}</p>
+<p>GST: {{ '{:.2f}'.format(invoice.tax) }}</p>
+<p>Discount: {{ '{:.2f}'.format(invoice.discount) }}</p>
+<h3>Total: {{ '{:.2f}'.format(invoice.total_amount) }}</h3>
+{% if invoice.payment_status != 'paid' %}
+<form method="post" action="{{ url_for('billing.pay_invoice', invoice_id=invoice.id) }}">
+  <button class="btn btn-success" type="submit">Mark as Paid</button>
+</form>
+{% endif %}
+<a href="{{ url_for('billing.print_invoice', invoice_id=invoice.id) }}" class="btn btn-primary">Print Invoice</a>
+{% endblock %}

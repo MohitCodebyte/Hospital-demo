@@ -1,0 +1,126 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}File Tracking{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="font-family: 'Inter', sans-serif;">
+  <h1 class="mb-4 text-primary">File Tracking</h1>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Total Files</h5>
+          <p class="display-5 fw-bold text-primary">{{ files|length }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Active Files</h5>
+          <p class="display-5 fw-bold text-success">
+            {{ files|selectattr('status','equalto','checked_out')|list|length }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Archived Files</h5>
+          <p class="display-5 fw-bold text-secondary">
+            {{ files|selectattr('status','equalto','archived')|list|length }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Moved Today</h5>
+          <p class="display-5 fw-bold text-info">
+            {{ files|selectattr('issue_date','defined')|selectattr('issue_date','date','today')|list|length }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Filters -->
+  <form method="GET" class="row g-3 mb-4" action="{{ url_for('mrd.file_tracking') }}">
+    <div class="col-md-2">
+      <input type="text" name="patient_id" class="form-control" placeholder="Patient ID" value="{{ request.args.get('patient_id','') }}" />
+    </div>
+    <div class="col-md-2">
+      <input type="text" name="file_number" class="form-control" placeholder="File Number" value="{{ request.args.get('file_number','') }}" />
+    </div>
+    <div class="col-md-2">
+      <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request.args.get('location','') }}" />
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">All Statuses</option>
+        <option value="archived" {% if request.args.get('status') == 'archived' %}selected{% endif %}>Archived</option>
+        <option value="checked_out" {% if request.args.get('status') == 'checked_out' %}selected{% endif %}>Checked Out</option>
+        <option value="transferred" {% if request.args.get('status') == 'transferred' %}selected{% endif %}>Transferred</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+    <div class="col-md-2">
+      <a href="{{ url_for('mrd.add_file_tracking') }}" class="btn btn-success w-100">Add New File</a>
+    </div>
+  </form>
+
+  <!-- Tracking Table -->
+  {% if files %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>File ID</th>
+          <th>Patient Name</th>
+          <th>File Number</th>
+          <th>Current Department</th>
+          <th>Current Holder</th>
+          <th>Status</th>
+          <th>Last Movement</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in files %}
+        <tr>
+          <td>{{ f.id }}</td>
+          <td>{{ f.patient.full_name if f.patient else 'N/A' }}</td>
+          <td>{{ f.file_number }}</td>
+          <td>{{ f.current_location }}</td>
+          <td>{{ f.issued_to_staff or '—' }}</td>
+          <td class="text-capitalize">{{ f.status }}</td>
+          <td>{{ f.issue_date.strftime('%Y-%m-%d') if f.issue_date else '—' }}</td>
+          <td>
+            <a href="{{ url_for('mrd.file_tracking') }}" class="btn btn-sm btn-outline-primary me-1">View</a>
+            <a href="{{ url_for('mrd.file_tracking') }}" class="btn btn-sm btn-outline-secondary me-1">Track History</a>
+            <a href="{{ url_for('mrd.file_tracking') }}" class="btn btn-sm btn-outline-success">Transfer</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <!-- Empty State -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+      <h4 class="card-title mb-3">No medical files available</h4>
+      <p class="text-muted">Use the "Add New File" button above to register a file.
+      </p>
+      <a href="{{ url_for('mrd.add_file_tracking') }}" class="btn btn-primary btn-lg mt-3">Add File</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'admin/layout.html' %}
+{% block title %}View Department{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Department Details</h2>
+        <a href="{{ url_for('admin.list_departments') }}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+    
+    <!-- Department Information -->
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Department Information</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <strong>Department Name:</strong> {{ department.department_name }}
+            </div>
+            <div class="col-md-6">
+                <strong>Department Code:</strong> {{ department.department_code or '-' }}
+            </div>
+            <div class="col-md-6">
+                <strong>Type:</strong>
+                <span class="badge bg-{{ 'primary' if department.department_type == 'OPD' else 'success' if department.department_type == 'IPD' else 'info' }}">
+                    {{ department.department_type }}
+                </span>
+            </div>
+            <div class="col-md-6">
+                <strong>Status:</strong>
+                {% if department.status == 'active' %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <strong>Head Doctor:</strong> {{ department.department_head.name if department.department_head else '-' }}
+            </div>
+            <div class="col-md-6">
+                <strong>Created Date:</strong> {{ department.created_at.strftime('%Y-%m-%d') if department.created_at else '-' }}
+            </div>
+            <div class="col-md-6">
+                <strong>Floor Number:</strong> {{ department.floor_number or '-' }}
+            </div>
+            <div class="col-md-6">
+                <strong>Building/Wing:</strong> {{ department.building_wing or '-' }}
+            </div>
+            <div class="col-md-6">
+                <strong>Phone Extension:</strong> {{ department.phone_extension or '-' }}
+            </div>
+            <div class="col-md-6">
+                <strong>Email:</strong> {{ department.email or '-' }}
+            </div>
+            <div class="col-12">
+                <strong>Description:</strong>
+                <p class="mt-2">{{ department.description or '-' }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assigned Doctors -->
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Assigned Doctors ({{ department.doctors|length }})</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doctor in department.doctors %}
+                    <tr>
+                        <td><strong>{{ doctor.name }}</strong></td>
+                        <td>{{ doctor.specialization }}</td>
+                        <td>{{ doctor.experience }} years</td>
+                        <td>{{ doctor.phone }}</td>
+                        <td>{{ doctor.email }}</td>
+                        <td>
+                            {% if doctor.availability %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Unavailable</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-3">No doctors assigned to this department</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('admin.edit_department', department_id=department.id) }}" class="btn btn-primary">
+            <i class="fa-solid fa-edit me-2"></i>Edit Department
+        </a>
+        <a href="{{ url_for('admin.delete_department', department_id=department.id) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this department? This will also delete all doctors in this department.')">
+            <i class="fa-solid fa-trash me-2"></i>Delete Department
+        </a>
+    </div>
+</div>
+{% endblock %}

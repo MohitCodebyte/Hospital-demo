@@ -1,0 +1,159 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Department Management{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Department Management</h2>
+    
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Total Departments</h5>
+                <p class="display-6 text-primary">{{ departments|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Active Departments</h5>
+                <p class="display-6 text-success">{{ departments|selectattr('status', 'equalto', 'active')|list|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Inactive Departments</h5>
+                <p class="display-6 text-warning">{{ departments|selectattr('status', 'equalto', 'inactive')|list|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Total Doctors</h5>
+                <p class="display-6 text-info">{{ departments|map(attribute='doctors')|map('length')|sum }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter and Actions -->
+    <div class="glass-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Department List</h5>
+            <a href="{{ url_for('admin.add_department') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-2"></i>Add Department
+            </a>
+        </div>
+        
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Search by name..." id="searchInput">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="OPD">OPD</option>
+                    <option value="IPD">IPD</option>
+                    <option value="Both">Both</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-custom" id="departmentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Code</th>
+                        <th>Department Name</th>
+                        <th>Type</th>
+                        <th>Head Doctor</th>
+                        <th>Doctors Count</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                    <tr>
+                        <td>{{ department.id }}</td>
+                        <td>{{ department.department_code or '-' }}</td>
+                        <td><strong>{{ department.department_name }}</strong></td>
+                        <td>
+                            <span class="badge bg-{{ 'primary' if department.department_type == 'OPD' else 'success' if department.department_type == 'IPD' else 'info' }}">
+                                {{ department.department_type }}
+                            </span>
+                        </td>
+                        <td>{{ department.department_head.name if department.department_head else '-' }}</td>
+                        <td>{{ department.doctors|length }}</td>
+                        <td>
+                            {% if department.status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ department.created_at.strftime('%Y-%m-%d') if department.created_at else '-' }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.view_department', department_id=department.id) }}" class="btn btn-sm btn-outline-info">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('admin.edit_department', department_id=department.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('admin.delete_department', department_id=department.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure? This will also delete all doctors in this department.')">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5">
+                            <i class="fa-solid fa-hospital fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">No departments found</p>
+                            <small class="text-muted">Click "Add Department" to create your first department</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const table = document.getElementById('departmentsTable');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+        const typeValue = typeFilter.value.toLowerCase();
+        
+        rows.forEach(row => {
+            const name = row.cells[2].textContent.toLowerCase();
+            const status = row.cells[6].textContent.toLowerCase();
+            const type = row.cells[3].textContent.toLowerCase();
+            
+            const matchesSearch = name.includes(searchTerm);
+            const matchesStatus = !statusValue || status.includes(statusValue);
+            const matchesType = !typeValue || type.includes(typeValue);
+            
+            row.style.display = matchesSearch && matchesStatus && matchesType ? '' : 'none';
+        });
+    }
+    
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    typeFilter.addEventListener('change', filterTable);
+});
+</script>
+{% endblock %}

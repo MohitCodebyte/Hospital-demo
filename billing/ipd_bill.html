@@ -1,0 +1,163 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Generate IPD Bill{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Generate IPD Bill</h2>
+    
+    <div class="glass-card mb-4">
+        <form method="post">
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Patient</label>
+                    <select name="patient_id" class="form-select" required>
+                        <option value="" disabled selected>Select Patient</option>
+                        {% for p in patients %}
+                        <option value="{{ p.id }}">{{ p.full_name }} (ID: {{ p.id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Admission ID</label>
+                    <input type="text" name="admission_id" class="form-control" placeholder="e.g., ADM-001" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Room Number</label>
+                    <input type="text" name="room_number" class="form-control" placeholder="e.g., 101" required>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">Room Charges (₹)</label>
+                    <input type="number" step="0.01" name="room_charges" class="form-control" value="0" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Doctor Charges (₹)</label>
+                    <input type="number" step="0.01" name="doctor_charges" class="form-control" value="0" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Medicine Charges (₹)</label>
+                    <input type="number" step="0.01" name="medicine_charges" class="form-control" value="0" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Lab Charges (₹)</label>
+                    <input type="number" step="0.01" name="lab_charges" class="form-control" value="0" required>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Other Charges (₹)</label>
+                    <input type="number" step="0.01" name="other_charges" class="form-control" value="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Discount (₹)</label>
+                    <input type="number" step="0.01" name="discount" class="form-control" value="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Payment Method</label>
+                    <select name="payment_method" class="form-select">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="online">Online</option>
+                        <option value="insurance">Insurance</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-12">
+                    <label class="form-label">Notes</label>
+                    <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes about the IPD bill"></textarea>
+                </div>
+            </div>
+            
+            <div class="glass-card p-3 mb-4" style="background: rgba(79, 70, 229, 0.05);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Grand Total:</span>
+                    <span class="fs-4 fw-bold text-primary" id="grandTotal">₹0.00</span>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Generate IPD Bill</button>
+                <a href="{{ url_for('billing.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="glass-card">
+        <h5 class="mb-3">Recent IPD Bills</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Bill No</th>
+                        <th>Patient</th>
+                        <th>Admission ID</th>
+                        <th>Room</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ipd_bills %}
+                        {% for bill in ipd_bills %}
+                        <tr>
+                            <td>{{ bill.invoice_number }}</td>
+                            <td>{{ bill.patient.full_name if bill.patient else 'N/A' }}</td>
+                            <td>{{ bill.notes or 'N/A' }}</td>
+                            <td>{{ bill.notes or 'N/A' }}</td>
+                            <td>₹{{ "%.2f"|format(bill.total_amount) }}</td>
+                            <td>
+                                {% if bill.payment_status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ bill.invoice_date.strftime('%Y-%m-%d') if bill.invoice_date else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-3">No IPD bills found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roomCharges = document.querySelector('input[name="room_charges"]');
+    const doctorCharges = document.querySelector('input[name="doctor_charges"]');
+    const medicineCharges = document.querySelector('input[name="medicine_charges"]');
+    const labCharges = document.querySelector('input[name="lab_charges"]');
+    const otherCharges = document.querySelector('input[name="other_charges"]');
+    const discount = document.querySelector('input[name="discount"]');
+    const grandTotal = document.getElementById('grandTotal');
+    
+    function calculateTotal() {
+        const total = (parseFloat(roomCharges.value) || 0) + 
+                     (parseFloat(doctorCharges.value) || 0) + 
+                     (parseFloat(medicineCharges.value) || 0) + 
+                     (parseFloat(labCharges.value) || 0) + 
+                     (parseFloat(otherCharges.value) || 0) - 
+                     (parseFloat(discount.value) || 0);
+        grandTotal.textContent = '₹' + total.toFixed(2);
+    }
+    
+    roomCharges.addEventListener('input', calculateTotal);
+    doctorCharges.addEventListener('input', calculateTotal);
+    medicineCharges.addEventListener('input', calculateTotal);
+    labCharges.addEventListener('input', calculateTotal);
+    otherCharges.addEventListener('input', calculateTotal);
+    discount.addEventListener('input', calculateTotal);
+});
+</script>
+{% endblock %}

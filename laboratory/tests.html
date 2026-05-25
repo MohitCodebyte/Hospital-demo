@@ -1,0 +1,68 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Lab Test Catalog - Sahara Hospital ERP{% endblock %}
+
+{% block admin_content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h3 class="mb-1 fw-bold text-dark">Lab Diagnostics Master Catalog</h3>
+        <p class="text-muted mb-0">Manage diagnostic lab test items, billing rates, reference normal ranges, and units.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('laboratory.add_test') }}" class="btn btn-primary px-3 rounded-pill">
+            <i class="fa-solid fa-plus me-1"></i> Add New Diagnostic Test
+        </a>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Test Name</th>
+                    <th>Category</th>
+                    <th>Billing Rate (₹)</th>
+                    <th>Reference Range</th>
+                    <th>Reporting Unit</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for test in tests %}
+                <tr>
+                    <td>#{{ test.id }}</td>
+                    <td class="fw-bold text-indigo">{{ test.test_name }}</td>
+                    <td><span class="badge bg-cyan-subtle text-cyan border border-cyan-subtle px-3 py-1 rounded-pill">{{ test.category }}</span></td>
+                    <td class="fw-bold text-dark">₹{{ "%.2f"|format(test.rate) }}</td>
+                    <td class="font-monospace">{{ test.normal_range if test.normal_range else 'N/A' }}</td>
+                    <td>{{ test.unit if test.unit else 'N/A' }}</td>
+                    <td class="text-end">
+                        <div class="btn-group gap-2">
+                            <a href="{{ url_for('laboratory.edit_test', id=test.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="fa-regular fa-pen-to-square"></i> Edit
+                            </a>
+                            <a href="{{ url_for('laboratory.delete_test', id=test.id) }}" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Are you sure you want to delete this lab test from master data?');">
+                                <i class="fa-regular fa-trash-can"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No diagnostic tests registered in master catalog.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .text-indigo { color: #4f46e5; }
+    .text-cyan { color: #0891b2; }
+    .bg-cyan-subtle { background-color: rgba(6, 182, 212, 0.08); }
+    .border-cyan-subtle { border-color: rgba(6, 182, 212, 0.2) !important; }
+</style>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Consultation - OPD Management{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">OPD Management</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white-50" href="{{ url_for('opd.dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.checkin') }}">
+                <i class="fas fa-user-check me-2"></i>Patient Check-in
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.queue') }}">
+                <i class="fas fa-users me-2"></i>Patient Queue
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.fees') }}">
+                <i class="fas fa-dollar-sign me-2"></i>OPD Fees
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Consultation - Token #{{ visit.token_number }}</h2>
+            <a href="{{ url_for('opd.queue') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Queue
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="glass-card animate-on-scroll fade-in-up">
+                    <h4 class="mb-4">Patient Details</h4>
+                    <div class="mb-3">
+                        <strong>Name:</strong> {{ visit.patient.full_name }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Age:</strong> {{ visit.patient.age }} years
+                    </div>
+                    <div class="mb-3">
+                        <strong>Gender:</strong> {{ visit.patient.gender }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong> {{ visit.patient.phone }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Chief Complaint:</strong> {{ visit.chief_complaint }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="glass-card animate-on-scroll fade-in-up" style="animation-delay: 0.1s">
+                    <h4 class="mb-4">Vitals & Notes</h4>
+                    <form method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Blood Pressure</label>
+                                <input type="text" name="bp" class="form-control" placeholder="120/80">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Pulse (bpm)</label>
+                                <input type="number" name="pulse" class="form-control" placeholder="72">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Temperature (°F)</label>
+                                <input type="number" step="0.1" name="temp" class="form-control" placeholder="98.6">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Weight (kg)</label>
+                                <input type="number" name="weight" class="form-control" placeholder="70">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Height (cm)</label>
+                                <input type="number" name="height" class="form-control" placeholder="170">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Consultation Notes</label>
+                                <textarea name="notes" class="form-control" rows="4" placeholder="Enter consultation notes..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Notes
+                                </button>
+                                <a href="{{ url_for('opd.complete_consultation', visit_id=visit.id) }}" class="btn btn-success">
+                                    <i class="fas fa-check me-2"></i>Complete Consultation
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

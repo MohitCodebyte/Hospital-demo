@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}OPD Slip - Sahara Hospital{% endblock %}
+
+{% block content %}
+<style>
+@page{
+    size:A4;
+    margin:5mm;
+}
+@media print {
+
+    body{
+        margin:0 !important;
+        padding:0 !important;
+    }
+    footer,
+    .footer,
+    .back-to-top,
+    .navbar,
+    header{
+        display:none !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+    .opd-slip {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        margin: 0 !important;
+    }
+}
+
+
+.opd-slip{
+    width:190mm;
+    margin:auto;
+    padding:10mm;
+    border:2px solid #000;
+    background:#fff;
+}
+
+.slip-header {
+    text-align: center;
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.slip-header h2 {
+    color: #1a1a2e;
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.slip-header p {
+    color: #666;
+    margin: 2px 0;
+    font-size: 0.8rem;
+}
+ # main
+.opd-slip-container{
+    padding-bottom: 20px;
+}
+
+.token-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.slip-section {
+    margin-bottom: 0.5rem;
+}
+
+.slip-section h5 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    padding-bottom: 2px;
+    color: #1a1a2e;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.3rem;
+}
+
+.slip-row {
+    display:flex;
+    justify-content:space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.slip-label {
+    font-size:14px;
+    font-weight: 600;
+    color: #555;
+    width: 45%;
+}
+
+.slip-value {
+    font-size:14px;
+    color: #333;
+    width: 55%;
+    text-align: right;
+    font-weight: 500;
+}
+
+.qr-section {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.qr-section img {
+    max-width: 150px;
+    border: 2px solid #ddd;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.signature-section{
+    margin-top:5px;
+    padding-top:0px;
+    border-top:1px solid #ccc;
+}
+
+.signature-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:50px;
+}
+
+.signature-box{
+    flex:1;
+    text-align:center;
+}
+
+.signature-line{
+    border-top:1px solid #000;
+    margin-bottom:8px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-waiting {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-in-progress {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.opd-slip{
+    max-width:900px;
+    min-height:auto;
+    margin:0;
+    margin-top:0
+    padding:8mm;
+}
+
+.doctor-notes{
+    height: 570px;
+    min-height: 500px;
+    border:1px dashed #ccc;
+    border-radius:8px;
+}
+</style>
+
+<div class="container-fluid opd-slip-container">
+    <div class="no-print mb-4 text-center">
+        <a href="{{ url_for('opd.staff_panel') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Staff Panel
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print me-2"></i>Print OPD Slip
+        </button>
+    </div>
+
+    <div class="opd-slip animate-on-scroll fade-in-up mb-5">
+        <div class="slip-header">
+            <h2>SAHARA HOSPITAL</h2>
+            <p>Professional Healthcare Services</p>
+            <p>OPD Registration Slip</p>
+        </div>
+
+
+
+        <div class="patient-consultation-grid">
+
+            <div class="slip-section">
+
+                <h5>Patient Information</h5>
+
+                <div class="slip-row">
+                    <span class="slip-label">Patient Name:</span>
+                    <span class="slip-value">{{ visit.patient.full_name }}</span>
+                </div>
+
+                <div class="slip-row">
+                    <span class="slip-label">Phone Number:</span>
+                    <span class="slip-value">{{ visit.patient.phone }}</span>
+                </div>
+
+                <div class="slip-row">
+                    <span class="slip-label">Age/Gender:</span>
+                    <span class="slip-value">
+                        {{ visit.patient.age }} / {{ visit.patient.gender }}
+                    </span>
+                </div>
+
+                <div class="slip-row">
+                    <span class="slip-label">Date:</span>
+                    <span class="slip-value">
+                        {{ visit.visit_date.strftime('%d-%m-%Y') }}
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="slip-section">
+
+                <h5>Consultation Details</h5>
+
+                <div class="slip-row">
+                    <span class="slip-label">Department:</span>
+                    <span class="slip-value">
+                        {{ visit.doctor.department.department_name }}
+                    </span>
+                </div>
+
+                <div class="slip-row">
+                    <span class="slip-label">Assigned Doctor:</span>
+                    <span class="slip-value">
+                        Dr. {{ visit.doctor.name }}
+                    </span>
+                </div>
+
+                <div class="slip-row">
+                    <span class="slip-label">Token No:</span>
+                    <span class="slip-value">
+                        {{ visit.token_number }}
+                    </span>
+                </div>
+
+                
+
+            </div>
+
+        </div>
+
+        
+        <div class="doctor-notes">
+
+           
+
+        </div>
+
+        <div class="signature-section">
+
+            <div class="signature-row">
+
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <p>Doctor Signature</p>
+                </div>
+
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <p>Staff Signature</p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="text-center mt-4 pt-3" style="border-top: 1px solid #ddd;">
+            
+            <p class="text-muted small mb-0">© {{ visit.visit_date.year }} Sahara Hospital. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

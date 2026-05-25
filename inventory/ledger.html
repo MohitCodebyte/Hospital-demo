@@ -1,0 +1,116 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Stock Ledger{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Stock Ledger</h2>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Total Transactions</h5>
+                <p class="display-6 text-primary">{{ ledger|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Stock In</h5>
+                <p class="display-6 text-success">{{ ledger|selectattr('quantity', 'greaterthan', 0)|list|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Stock Out</h5>
+                <p class="display-6 text-warning">{{ ledger|selectattr('quantity', 'lessthan', 0)|list|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Today's Activity</h5>
+                <p class="display-6 text-info">{{ ledger|selectattr('transaction_date', 'equalto', today)|list|length if today else 0 }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="glass-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Transaction History</h5>
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control" placeholder="Search transactions..." style="width: 250px;">
+                <button class="btn btn-outline-primary">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Item</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Department</th>
+                        <th>Reference</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ledger %}
+                        {% for entry in ledger %}
+                        <tr>
+                            <td>{{ entry.transaction_date.strftime('%Y-%m-%d %H:%M') if entry.transaction_date else 'N/A' }}</td>
+                            <td>{{ entry.item.item_name if entry.item else 'N/A' }}</td>
+                            <td>
+                                {% if entry.transaction_type == 'purchase' %}
+                                    <span class="badge bg-success">Stock In</span>
+                                {% elif entry.transaction_type == 'issue' %}
+                                    <span class="badge bg-warning text-dark">Stock Out</span>
+                                {% elif entry.transaction_type == 'return' %}
+                                    <span class="badge bg-info">Return</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ entry.transaction_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="{{ 'text-success' if entry.quantity > 0 else 'text-danger' }}">
+                                {{ entry.quantity }}
+                            </td>
+                            <td>{{ entry.department.department_name if entry.department else 'N/A' }}</td>
+                            <td>{{ entry.reference_id or 'N/A' }}</td>
+                            <td>{{ entry.notes or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="fa-solid fa-book-open fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No ledger transactions found.</p>
+                                <small class="text-muted">Stock transactions will appear here when inventory is managed.</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="row g-4 mt-4">
+        <div class="col-md-12">
+            <div class="glass-card">
+                <h5 class="mb-3">Export Ledger</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-file-pdf me-2"></i>Export PDF
+                    </button>
+                    <button class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                    </button>
+                    <button class="btn btn-info">
+                        <i class="fa-solid fa-print me-2"></i>Print Ledger
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

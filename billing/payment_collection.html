@@ -1,0 +1,157 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Payment Collection{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Payment Collection</h2>
+    
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Pending Invoices</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Patient</th>
+                        <th>Due Amount</th>
+                        <th>Invoice Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if pending_invoices %}
+                        {% for invoice in pending_invoices %}
+                        <tr>
+                            <td><strong>{{ invoice.invoice_number }}</strong></td>
+                            <td>{{ invoice.patient.full_name if invoice.patient else 'N/A' }}</td>
+                            <td class="text-danger fw-bold">₹{{ "%.2f"|format(invoice.total_amount) }}</td>
+                            <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') if invoice.invoice_date else 'N/A' }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="selectInvoice({{ invoice.id }}, '{{ invoice.invoice_number }}', {{ invoice.total_amount }})">Collect Payment</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-3">No pending invoices</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Collect Payment</h5>
+        <form method="post">
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Invoice</label>
+                    <input type="text" name="invoice_number" id="invoice_number" class="form-control" readonly placeholder="Select an invoice above">
+                    <input type="hidden" name="invoice_id" id="invoice_id">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Patient</label>
+                    <input type="text" name="patient_name" id="patient_name" class="form-control" readonly placeholder="Patient name">
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Due Amount (₹)</label>
+                    <input type="number" step="0.01" name="due_amount" id="due_amount" class="form-control" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Payment Amount (₹)</label>
+                    <input type="number" step="0.01" name="payment_amount" id="payment_amount" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Payment Mode</label>
+                    <select name="payment_mode" class="form-select" required>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="online">Online</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Reference Number</label>
+                    <input type="text" name="reference_number" class="form-control" placeholder="Transaction ID / Cheque Number">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Remarks</label>
+                    <input type="text" name="remarks" class="form-control" placeholder="Optional">
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Collect Payment</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="printReceipt()">Print Receipt</button>
+                <a href="{{ url_for('billing.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="glass-card">
+        <h5 class="mb-3">Recent Collections</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice No</th>
+                        <th>Patient</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_collections %}
+                        {% for collection in recent_collections %}
+                        <tr>
+                            <td>{{ collection.invoice_date.strftime('%Y-%m-%d') if collection.invoice_date else 'N/A' }}</td>
+                            <td>{{ collection.invoice_number }}</td>
+                            <td>{{ collection.patient.full_name if collection.patient else 'N/A' }}</td>
+                            <td class="text-success fw-bold">₹{{ "%.2f"|format(collection.total_amount) }}</td>
+                            <td>{{ collection.payment_method|upper if collection.payment_method else 'N/A' }}</td>
+                            <td>{{ collection.notes or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-3">No recent collections</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectInvoice(invoiceId, invoiceNumber, amount) {
+    document.getElementById('invoice_id').value = invoiceId;
+    document.getElementById('invoice_number').value = invoiceNumber;
+    document.getElementById('due_amount').value = amount;
+    document.getElementById('payment_amount').value = amount;
+    
+    // Find patient name from the table
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const btn = row.querySelector('button');
+        if (btn && btn.getAttribute('onclick').includes(invoiceId)) {
+            const patientCell = row.cells[1];
+            document.getElementById('patient_name').value = patientCell.textContent.trim();
+        }
+    });
+}
+
+function printReceipt() {
+    window.print();
+}
+</script>
+{% endblock %}

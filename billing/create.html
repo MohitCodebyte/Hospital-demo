@@ -1,0 +1,370 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Create Custom Invoice - Sahara Hospital ERP{% endblock %}
+
+{% block admin_content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h3 class="mb-1 fw-bold text-dark">Custom Invoice Builder</h3>
+        <p class="text-muted mb-0">Manually construct patient invoices, link OPD appointments, and adjust tax/discount rates.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('billing.invoices') }}" class="btn btn-outline-secondary px-3 rounded-pill">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Registry
+        </a>
+    </div>
+</div>
+
+<div class="glass-card">
+    <form method="POST" id="invoiceForm">
+        <!-- Invoice Metadata -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label for="patient_id" class="form-label fw-semibold">Patient Name *</label>
+                <select class="form-select rounded-3" id="patient_id" name="patient_id" required>
+                    <option value="" disabled selected>Select Patient</option>
+                    {% for patient in patients %}
+                    <option value="{{ patient.id }}">{{ patient.full_name }} (ID: {{ patient.id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="opd_visit_id" class="form-label fw-semibold">Link OPD Visit</label>
+                <select class="form-select rounded-3" id="opd_visit_id" name="opd_visit_id">
+                    <option value="">None / Direct Billing</option>
+                    {% for visit in opd_visits %}
+                    <option value="{{ visit.id }}">Token #{{ visit.token_number }} - {{ visit.patient.full_name }} (Date: {{ visit.visit_date }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="appointment_id" class="form-label fw-semibold">Link Appointment</label>
+                <select class="form-select rounded-3" id="appointment_id" name="appointment_id">
+                    <option value="">None / Walk-in</option>
+                    {% for app in appointments %}
+                    <option value="{{ app.id }}">Appt #{{ app.id }} - {{ app.patient.full_name }} (Dr. {{ app.doctor.name }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Master Item Helpers -->
+        <div class="p-3 mb-4 rounded border bg-light">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-magic me-1"></i> Quick Add Predefined Items</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label text-xs fw-semibold">Predefined Consultation OPD Fee</label>
+                    <select class="form-select form-select-sm" id="predefined_opd_fee">
+                        <option value="">-- Choose Consultation --</option>
+                        {% for fee in opd_fees %}
+                        <option value="{{ fee.fee_name }}" data-price="{{ fee.amount }}">{{ fee.fee_name }} (₹{{ fee.amount }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-xs fw-semibold">Predefined Lab Diagnostic Test</label>
+                    <select class="form-select form-select-sm" id="predefined_lab">
+                        <option value="">-- Choose Lab Test --</option>
+                        {% for test in lab_tests %}
+                        <option value="Lab Test - {{ test.test_name }}" data-price="{{ test.rate }}">{{ test.test_name }} (₹{{ test.rate }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-xs fw-semibold">Predefined Pharmacy Medicine Batch</label>
+                    <select class="form-select form-select-sm" id="predefined_med">
+                        <option value="">-- Choose Medicine Batch --</option>
+                        {% for med in medicines %}
+                        <option value="Medicine - {{ med.name }} (Batch: {{ med.batch_number }})" data-price="{{ med.sale_price }}">
+                            {{ med.name }} - Batch {{ med.batch_number }} (₹{{ med.sale_price }} | Stock: {{ med.current_qty }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-bold mb-3 border-bottom pb-2 text-primary">Invoice Line Items</h5>
+
+        <!-- Multi-item table -->
+        <div class="table-responsive mb-3">
+            <table class="table table-bordered align-middle" id="itemsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 45%;">Item Description / Name *</th>
+                        <th style="width: 15%;">Item Category *</th>
+                        <th style="width: 12%;">Quantity *</th>
+                        <th style="width: 13%;">Unit Price (₹) *</th>
+                        <th style="width: 10%;">Total</th>
+                        <th style="width: 5%;"></th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr class="item-row">
+                        <td>
+                            <input type="text" class="form-control rounded-3" name="item_name[]" required placeholder="e.g. Doctor Consultation Fee">
+                        </td>
+                        <td>
+                            <select class="form-select rounded-3" name="item_type[]">
+                                <option value="consultation">Consultation</option>
+                                <option value="medicine">Medicine</option>
+                                <option value="lab_test">Lab Test</option>
+                                <option value="procedure">Procedure</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control rounded-3 qty-input" name="quantity[]" min="1" required value="1">
+                        </td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control rounded-3 price-input" name="unit_price[]" min="0" required placeholder="0.00">
+                        </td>
+                        <td>
+                            <span class="row-total fw-bold text-dark">₹0.00</span>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-circle remove-row-btn"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button type="button" class="btn btn-outline-indigo px-3 rounded-pill mb-4" id="addRowBtn">
+            <i class="fa-solid fa-plus me-1"></i> Add Custom Row
+        </button>
+
+        <!-- Calculations -->
+        <div class="row justify-content-end">
+            <div class="col-md-5">
+                <div class="glass-card p-3" style="background: rgba(255, 255, 255, 0.65);">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal:</span>
+                        <span class="fw-bold" id="subtotalVal">₹0.00</span>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 d-flex align-items-center">
+                            <span class="text-muted text-xs">CGST Rate (%):</span>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" step="0.01" class="form-control form-control-sm" id="cgst_rate" name="cgst_rate" value="9.0">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 d-flex align-items-center">
+                            <span class="text-muted text-xs">SGST Rate (%):</span>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" step="0.01" class="form-control form-control-sm" id="sgst_rate" name="sgst_rate" value="9.0">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Discount Applied:</span>
+                        <div class="input-group" style="width: 150px;">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" step="0.01" class="form-control" id="discount" name="discount" value="0.00" min="0">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fs-5 fw-bold text-dark">Net Total Due:</span>
+                        <span class="fs-4 fw-bold text-success" id="totalVal">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="notes" class="form-label fw-semibold">Billing Notes</label>
+            <textarea class="form-control rounded-3" id="notes" name="notes" rows="2" placeholder="e.g. Health insurance details or special invoice remarks..."></textarea>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <a href="{{ url_for('billing.invoices') }}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                <i class="fa-solid fa-save me-1"></i> Save & Generate Invoice
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Row template for cloning -->
+<table style="display: none;">
+    <tbody id="rowTemplate">
+        <tr class="item-row">
+            <td>
+                <input type="text" class="form-control rounded-3" name="item_name[]" required placeholder="Item Description">
+            </td>
+            <td>
+                <select class="form-select rounded-3" name="item_type[]">
+                    <option value="consultation">Consultation</option>
+                    <option value="medicine">Medicine</option>
+                    <option value="lab_test">Lab Test</option>
+                    <option value="procedure">Procedure</option>
+                    <option value="other">Other</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" class="form-control rounded-3 qty-input" name="quantity[]" min="1" required value="1">
+            </td>
+            <td>
+                <input type="number" step="0.01" class="form-control rounded-3 price-input" name="unit_price[]" min="0" required placeholder="0.00">
+            </td>
+            <td>
+                <span class="row-total fw-bold text-dark">₹0.00</span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle remove-row-btn"><i class="fa-solid fa-trash-can"></i></button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const itemsBody = document.getElementById('itemsBody');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const rowTemplate = document.getElementById('rowTemplate').querySelector('tr');
+        const cgstRateInput = document.getElementById('cgst_rate');
+        const sgstRateInput = document.getElementById('sgst_rate');
+        const discountInput = document.getElementById('discount');
+
+        // Quick add selectors
+        const predefinedOpd = document.getElementById('predefined_opd_fee');
+        const predefinedLab = document.getElementById('predefined_lab');
+        const predefinedMed = document.getElementById('predefined_med');
+
+        // Bind quick add selectors
+        predefinedOpd.addEventListener('change', function() {
+            if (this.value) {
+                const opt = this.options[this.selectedIndex];
+                const price = opt.getAttribute('data-price');
+                appendPredefinedRow(this.value, 'consultation', price);
+                this.value = ""; // Reset dropdown
+            }
+        });
+
+        predefinedLab.addEventListener('change', function() {
+            if (this.value) {
+                const opt = this.options[this.selectedIndex];
+                const price = opt.getAttribute('data-price');
+                appendPredefinedRow(this.value, 'lab_test', price);
+                this.value = ""; // Reset dropdown
+            }
+        });
+
+        predefinedMed.addEventListener('change', function() {
+            if (this.value) {
+                const opt = this.options[this.selectedIndex];
+                const price = opt.getAttribute('data-price');
+                appendPredefinedRow(this.value, 'medicine', price);
+                this.value = ""; // Reset dropdown
+            }
+        });
+
+        function appendPredefinedRow(name, type, price) {
+            // Check if first row is empty, if so, reuse it
+            const rows = itemsBody.querySelectorAll('.item-row');
+            let targetRow = null;
+            if (rows.length === 1) {
+                const firstRow = rows[0];
+                const desc = firstRow.querySelector('input[name="item_name[]"]').value;
+                const cost = firstRow.querySelector('input[name="unit_price[]"]').value;
+                if (!desc && !cost) {
+                    targetRow = firstRow;
+                }
+            }
+
+            if (!targetRow) {
+                targetRow = rowTemplate.cloneNode(true);
+                itemsBody.appendChild(targetRow);
+                bindRowEvents(targetRow);
+            }
+
+            targetRow.querySelector('input[name="item_name[]"]').value = name;
+            targetRow.querySelector('select[name="item_type[]"]').value = type;
+            targetRow.querySelector('input[name="quantity[]"]').value = 1;
+            targetRow.querySelector('input[name="unit_price[]"]').value = price;
+            
+            updateRowTotal(targetRow);
+            calculateTotals();
+        }
+
+        // Add custom row
+        addRowBtn.addEventListener('click', function() {
+            const newRow = rowTemplate.cloneNode(true);
+            itemsBody.appendChild(newRow);
+            bindRowEvents(newRow);
+            calculateTotals();
+        });
+
+        // Remove row
+        itemsBody.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-row-btn')) {
+                const row = e.target.closest('.item-row');
+                if (itemsBody.querySelectorAll('.item-row').length > 1) {
+                    row.remove();
+                    calculateTotals();
+                } else {
+                    alert("At least one billing line item is required!");
+                }
+            }
+        });
+
+        // Dynamic change triggers
+        cgstRateInput.addEventListener('input', calculateTotals);
+        sgstRateInput.addEventListener('input', calculateTotals);
+        discountInput.addEventListener('input', calculateTotals);
+
+        // Bind initial rows
+        itemsBody.querySelectorAll('.item-row').forEach(bindRowEvents);
+
+        function bindRowEvents(row) {
+            const qty = row.querySelector('.qty-input');
+            const price = row.querySelector('.price-input');
+            qty.addEventListener('input', () => { updateRowTotal(row); calculateTotals(); });
+            price.addEventListener('input', () => { updateRowTotal(row); calculateTotals(); });
+        }
+
+        function updateRowTotal(row) {
+            const qty = parseInt(row.querySelector('.qty-input').value) || 0;
+            const price = parseFloat(row.querySelector('.price-input').value) || 0;
+            const total = qty * price;
+            row.querySelector('.row-total').textContent = '₹' + total.toFixed(2);
+            return total;
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            itemsBody.querySelectorAll('.item-row').forEach(row => {
+                const qty = parseInt(row.querySelector('.qty-input').value) || 0;
+                const price = parseFloat(row.querySelector('.price-input').value) || 0;
+                subtotal += qty * price;
+            });
+
+            const cgstRate = parseFloat(cgstRateInput.value) || 0;
+            const sgstRate = parseFloat(sgstRateInput.value) || 0;
+            const tax = subtotal * (cgstRate + sgstRate) / 100.0;
+            const discount = parseFloat(discountInput.value) || 0;
+            const total = subtotal + tax - discount;
+
+            document.getElementById('subtotalVal').textContent = '₹' + subtotal.toFixed(2);
+            document.getElementById('totalVal').textContent = '₹' + Math.max(0, total).toFixed(2);
+            document.getElementById('gstVal').textContent = '₹' + tax.toFixed(2);
+        }
+    });
+</script>
+<style>
+    .btn-outline-indigo {
+        color: #4f46e5;
+        border-color: #4f46e5;
+    }
+    .btn-outline-indigo:hover {
+        background-color: #4f46e5;
+        color: #fff;
+    }
+</style>
+{% endblock %}

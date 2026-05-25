@@ -1,0 +1,131 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Print Receipt{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Print Receipt</h2>
+    
+    <div class="glass-card mb-4">
+        <div class="text-center mb-4">
+            <i class="fa-solid fa-hospital fa-3x text-primary mb-2"></i>
+            <h3 class="fw-bold">Sahara Hospital</h3>
+            <p class="text-muted">Healthcare Excellence</p>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <strong>Invoice Number:</strong> {{ invoice.invoice_number if invoice else 'N/A' }}<br>
+                <strong>Date:</strong> {{ invoice.invoice_date.strftime('%Y-%m-%d') if invoice and invoice.invoice_date else 'N/A' }}<br>
+                <strong>Patient:</strong> {{ invoice.patient.full_name if invoice and invoice.patient else 'N/A' }}
+            </div>
+            <div class="col-md-6 text-end">
+                <strong>Payment Method:</strong> {{ invoice.payment_method|upper if invoice and invoice.payment_method else 'N/A' }}<br>
+                <strong>Status:</strong> 
+                {% if invoice and invoice.payment_status == 'paid' %}
+                    <span class="badge bg-success">Paid</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="mb-4">
+            <h5 class="mb-3">Invoice Details</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if invoice and invoice.items %}
+                            {% for item in invoice.items %}
+                            <tr>
+                                <td>{{ item.item_name }}</td>
+                                <td>{{ item.item_type }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ "%.2f"|format(item.unit_price) }}</td>
+                                <td>₹{{ "%.2f"|format(item.total_price) }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No items</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="row justify-content-end mb-4">
+            <div class="col-md-5">
+                <div class="glass-card p-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>₹{{ "%.2f"|format(invoice.subtotal) if invoice else '0.00' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span>₹{{ "%.2f"|format(invoice.tax) if invoice else '0.00' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Discount:</span>
+                        <span class="text-danger">-₹{{ "%.2f"|format(invoice.discount) if invoice else '0.00' }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5">
+                        <span>Total:</span>
+                        <span class="text-primary">₹{{ "%.2f"|format(invoice.total_amount) if invoice else '0.00' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-6 text-center">
+                <div class="border-top pt-2">
+                    <small class="text-muted">Authorized Signature</small>
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <div class="border-top pt-2">
+                    <small class="text-muted">Patient Signature</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fa-solid fa-print me-2"></i>Print Receipt
+            </button>
+            <a href="{{ url_for('billing.dashboard') }}" class="btn btn-outline-secondary ms-2">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .erp-sidebar, .erp-topbar, .alert-container, .no-print {
+        display: none !important;
+    }
+    .erp-main-area {
+        margin-left: 0 !important;
+        padding: 20px !important;
+    }
+    .glass-card {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+    }
+    body {
+        background: white !important;
+    }
+}
+</style>
+{% endblock %}

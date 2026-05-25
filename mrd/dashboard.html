@@ -1,0 +1,300 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}
+MRD Dashboard
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/mrd.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="mrd-wrapper">
+
+    <!-- Header -->
+    <div class="mrd-header">
+
+        <div>
+
+            <h1>
+                Medical Records Department
+            </h1>
+
+            <p>
+                Patient records, reports, prescriptions and visit history
+            </p>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a href="{{ url_for('mrd.patients') }}"
+               class="btn btn-primary">
+
+                <i class="fas fa-users me-2"></i>
+
+                Patient Records
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="mrd-card blue-card">
+
+                <i class="fas fa-users"></i>
+
+                <h2>
+                    {{ stats.patients }}
+                </h2>
+
+                <p>
+                    Total Patients
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="mrd-card green-card">
+
+                <i class="fas fa-calendar-check"></i>
+
+                <h2>
+                    {{ stats.appointments }}
+                </h2>
+
+                <p>
+                    Appointments
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="mrd-card orange-card">
+
+                <i class="fas fa-stethoscope"></i>
+
+                <h2>
+                    {{ stats.opd_visits }}
+                </h2>
+
+                <p>
+                    OPD Visits
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="mrd-card red-card">
+
+                <i class="fas fa-file-medical"></i>
+
+                <h2>
+                    {{ stats.prescriptions }}
+                </h2>
+
+                <p>
+                    Prescriptions
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Second Row -->
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-lg-4">
+
+            <div class="mrd-card purple-card">
+
+                <i class="fas fa-file-pdf"></i>
+
+                <h2>
+                    {{ stats.reports }}
+                </h2>
+
+                <p>
+                    Medical Reports
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-8">
+
+            <div class="recent-records">
+
+                <div class="card shadow border-0">
+
+                    <div class="card-header bg-white">
+
+                        <h4>
+                            Recent Patient Registrations
+                        </h4>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <table class="table table-hover">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Gender</th>
+                                    <th>Age</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for patient in recent_patients %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ patient.id }}
+                                    </td>
+
+                                    <td>
+                                        {{ patient.full_name }}
+                                    </td>
+
+                                    <td>
+                                        {{ patient.phone }}
+                                    </td>
+
+                                    <td>
+                                        {{ patient.gender }}
+                                    </td>
+
+                                    <td>
+                                        {{ patient.age }}
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+
+    <div class="quick-actions mt-5">
+
+        <h3 class="mb-4">
+
+            Quick Actions
+
+        </h3>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+
+                <a href="{{ url_for('mrd.patients') }}"
+                   class="quick-btn">
+
+                    <i class="fas fa-user-injured"></i>
+
+                    <span>
+                        Patient Records
+                    </span>
+
+                </a>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <a href="#"
+                   class="quick-btn">
+
+                    <i class="fas fa-notes-medical"></i>
+
+                    <span>
+                        Prescriptions
+                    </span>
+
+                </a>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <a href="#"
+                   class="quick-btn">
+
+                    <i class="fas fa-file-medical-alt"></i>
+
+                    <span>
+                        Medical Reports
+                    </span>
+
+                </a>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <a href="#"
+                   class="quick-btn">
+
+                    <i class="fas fa-history"></i>
+
+                    <span>
+                        Visit Timeline
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

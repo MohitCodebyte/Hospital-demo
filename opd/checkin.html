@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Check-in - OPD Management{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">OPD Management</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white-50" href="{{ url_for('opd.dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link text-white active" href="{{ url_for('opd.checkin') }}">
+                <i class="fas fa-user-check me-2"></i>Patient Check-in
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.queue') }}">
+                <i class="fas fa-users me-2"></i>Patient Queue
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.fees') }}">
+                <i class="fas fa-dollar-sign me-2"></i>OPD Fees
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Patient Check-in</h2>
+            <a href="{{ url_for('opd.dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        <div class="glass-card animate-on-scroll fade-in-up">
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Select Patient *</label>
+                        <select name="patient_id" class="form-select" required>
+                            <option value="">Choose Patient</option>
+                            {% for patient in patients %}
+                            <option value="{{ patient.id }}">{{ patient.full_name }} ({{ patient.email }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Select Doctor *</label>
+                        <select name="doctor_id" class="form-select" required>
+                            <option value="">Choose Doctor</option>
+                            {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.name }} - {{ doctor.specialization }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Chief Complaint *</label>
+                        <textarea name="chief_complaint" class="form-control" rows="3" required placeholder="Describe the patient's chief complaint"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-check me-2"></i>Check-in Patient
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

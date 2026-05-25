@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}
+Patient Timeline
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/mrd.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="mrd-wrapper">
+
+    <div class="mrd-header">
+
+        <div>
+
+            <h1>
+                Patient Medical Timeline
+            </h1>
+
+            <p>
+                Complete history for {{ patient.full_name }}
+            </p>
+
+        </div>
+
+        <a href="{{ url_for(
+            'mrd.patient_profile',
+            patient_id=patient.id
+        ) }}"
+        class="btn btn-primary">
+
+            <i class="fas fa-arrow-left me-2"></i>
+
+            Back to Record
+
+        </a>
+
+    </div>
+
+    <div class="timeline-container">
+
+        <!-- Registration -->
+
+        <div class="timeline-item">
+
+            <div class="timeline-icon bg-primary">
+
+                <i class="fas fa-user-plus"></i>
+
+            </div>
+
+            <div class="timeline-content">
+
+                <h5>
+                    Patient Registration
+                </h5>
+
+                <p>
+                    {{ patient.full_name }}
+                    registered in hospital.
+                </p>
+
+                {% if patient.created_at %}
+                <small>
+                    {{ patient.created_at.strftime('%d-%m-%Y') }}
+                </small>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- Appointments -->
+
+        {% for appointment in appointments %}
+
+        <div class="timeline-item">
+
+            <div class="timeline-icon bg-success">
+
+                <i class="fas fa-calendar-check"></i>
+
+            </div>
+
+            <div class="timeline-content">
+
+                <h5>
+                    Appointment Scheduled
+                </h5>
+
+                <p>
+
+                    Doctor:
+                    {{ appointment.doctor.name }}
+
+                </p>
+
+                <p>
+
+                    Status:
+                    {{ appointment.status }}
+
+                </p>
+
+                <small>
+
+                    {{ appointment.appointment_date }}
+
+                </small>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <!-- OPD Visits -->
+
+        {% for visit in visits %}
+
+        <div class="timeline-item">
+
+            <div class="timeline-icon bg-warning">
+
+                <i class="fas fa-stethoscope"></i>
+
+            </div>
+
+            <div class="timeline-content">
+
+                <h5>
+
+                    OPD Visit
+
+                </h5>
+
+                <p>
+
+                    Token:
+                    {{ visit.token_number }}
+
+                </p>
+
+                <p>
+
+                    Status:
+                    {{ visit.status }}
+
+                </p>
+
+                <small>
+
+                    {{ visit.visit_date }}
+
+                </small>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <!-- Prescriptions -->
+
+        {% for prescription in prescriptions %}
+
+        <div class="timeline-item">
+
+            <div class="timeline-icon bg-danger">
+
+                <i class="fas fa-prescription"></i>
+
+            </div>
+
+            <div class="timeline-content">
+
+                <h5>
+
+                    Prescription Generated
+
+                </h5>
+
+                <p>
+
+                    Diagnosis:
+                    {{ prescription.diagnosis }}
+
+                </p>
+
+                <small>
+
+                    {{ prescription.prescription_date }}
+
+                </small>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <!-- Medical Reports -->
+
+        {% for report in reports %}
+
+        <div class="timeline-item">
+
+            <div class="timeline-icon bg-info">
+
+                <i class="fas fa-file-medical"></i>
+
+            </div>
+
+            <div class="timeline-content">
+
+                <h5>
+
+                    Medical Report Added
+
+                </h5>
+
+                <p>
+
+                    {{ report.report_title }}
+
+                </p>
+
+                <p>
+
+                    {{ report.report_type }}
+
+                </p>
+
+                <small>
+
+                    {{ report.report_date }}
+
+                </small>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

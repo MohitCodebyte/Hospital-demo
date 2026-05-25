@@ -1,0 +1,82 @@
+{% extends 'admin/layout.html' %}
+{% block title %}{{ 'Edit' if department else 'Add' }} Department{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ 'Edit' if department else 'Add' }} Department</h2>
+        <a href="{{ url_for('admin.list_departments') }}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+    
+    <div class="glass-card">
+        <form method="POST">
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Department Name *</label>
+                    <input type="text" name="department_name" class="form-control" required value="{{ department.department_name if department else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Department Code</label>
+                    <input type="text" name="department_code" class="form-control" value="{{ department.department_code if department else '' }}">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3">{{ department.description if department else '' }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Department Type</label>
+                    <select name="department_type" class="form-select">
+                        <option value="OPD" {% if department and department.department_type == 'OPD' %}selected{% endif %}>OPD</option>
+                        <option value="IPD" {% if department and department.department_type == 'IPD' %}selected{% endif %}>IPD</option>
+                        <option value="Both" {% if department and department.department_type == 'Both' %}selected{% endif %}>Both</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Department Head (Doctor)</label>
+                    <select name="department_head_id" class="form-select">
+                        <option value="">-- Select Head Doctor --</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}" {% if department and department.department_head_id == doctor.id %}selected{% endif %}>{{ doctor.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="active" {% if not department or department.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if department and department.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Floor Number</label>
+                    <input type="text" name="floor_number" class="form-control" value="{{ department.floor_number if department else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Building/Wing</label>
+                    <input type="text" name="building_wing" class="form-control" value="{{ department.building_wing if department else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Phone Extension</label>
+                    <input type="text" name="phone_extension" class="form-control" value="{{ department.phone_extension if department else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ department.email if department else '' }}">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Image URL</label>
+                    <input type="text" name="image" class="form-control" value="{{ department.image if department else '' }}">
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save me-2"></i>{{ 'Update' if department else 'Add' }} Department
+                </button>
+                <a href="{{ url_for('admin.list_departments') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

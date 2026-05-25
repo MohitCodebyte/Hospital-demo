@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}
+OPD Token - Sahara Hospital
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="page-header"
+         style="background: linear-gradient(135deg,#0d6efd,#2563eb);
+                padding: 100px 0;">
+
+    <div class="container text-center">
+
+        <h1 class="display-4 fw-bold text-white mb-3">
+
+            OPD Token Booking
+
+        </h1>
+
+        <p class="lead text-white-50">
+
+            Book your OPD token and join the live consultation queue
+
+        </p>
+
+    </div>
+
+</section>
+
+<!-- TOKEN FORM -->
+<section class="section py-5">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+                <div class="glass-card opd-card p-5">
+
+                    <!-- HEADER -->
+                    <div class="text-center mb-5">
+
+                        <div class="token-icon mx-auto mb-4">
+
+                            <i class="fas fa-hospital-user"></i>
+
+                        </div>
+
+                        <h2 class="fw-bold">
+
+                            Generate Your OPD Token
+
+                        </h2>
+
+                        <p class="text-muted">
+
+                            Fill your details to receive instant OPD token
+
+                        </p>
+
+                    </div>
+
+                    <!-- FLASH MESSAGES -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+
+                                    {{ message }}
+
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="alert"></button>
+
+                                </div>
+
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- FORM -->
+                    <form method="POST"
+                          action="{{ url_for('opd.checkin') }}">
+
+                        <div class="row">
+
+                            <!-- PATIENT ID -->
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+
+                                    Patient ID
+
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+
+                                        <i class="fas fa-id-card"></i>
+
+                                    </span>
+
+                                    <input type="number"
+                                           name="patient_id"
+                                           class="form-control"
+                                           placeholder="Enter patient ID"
+                                           required>
+
+                                </div>
+
+                            </div>
+
+                            <!-- DOCTOR -->
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+
+                                    Select Doctor
+
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+
+                                        <i class="fas fa-user-md"></i>
+
+                                    </span>
+
+                                    <select name="doctor_id"
+                                            class="form-select"
+                                            required>
+
+                                        <option value="">
+
+                                            Choose Doctor
+
+                                        </option>
+
+                                        {% for doctor in doctors %}
+
+                                        <option value="{{ doctor.id }}">
+
+                                            {{ doctor.name }}
+
+                                        </option>
+
+                                        {% endfor %}
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- COMPLAINT -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+
+                                Symptoms / Chief Complaint
+
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+
+                                    <i class="fas fa-notes-medical"></i>
+
+                                </span>
+
+                                <textarea name="chief_complaint"
+                                          rows="4"
+                                          class="form-control"
+                                          placeholder="Describe your symptoms"></textarea>
+
+                            </div>
+
+                        </div>
+
+                        <!-- BUTTON -->
+                        <button type="submit"
+                                class="btn btn-primary btn-lg w-100 rounded-pill opd-btn">
+
+                            <i class="fas fa-ticket-alt me-2"></i>
+
+                            Generate OPD Token
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- CSS -->
+<style>
+
+.opd-card{
+    border-radius: 30px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+}
+
+.token-icon{
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg,#0d6efd,#2563eb);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 42px;
+    box-shadow: 0 10px 25px rgba(13,110,253,0.3);
+}
+
+.form-control,
+.form-select{
+    height: 55px;
+    border-radius: 14px;
+    font-size: 16px;
+}
+
+textarea.form-control{
+    height: auto;
+    border-radius: 14px;
+}
+
+.input-group-text{
+    border-radius: 14px 0 0 14px;
+    background: #f8f9fa;
+}
+
+.opd-btn{
+    height: 60px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.opd-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(13,110,253,0.25);
+}
+
+@media(max-width:768px){
+
+    .page-header{
+        padding: 70px 0 !important;
+    }
+
+    .display-4{
+        font-size: 2.3rem;
+    }
+
+    .opd-card{
+        padding: 30px !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}

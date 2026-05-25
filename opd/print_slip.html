@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}OPD Slip - Sahara Hospital{% endblock %}
+
+{% block content %}
+
+<style>
+
+@media print {
+
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    .opd-slip {
+        border: 2px solid #000 !important;
+        box-shadow: none !important;
+    }
+
+}
+
+.opd-slip {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 30px;
+    border: 2px solid #1a1a2e;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.slip-header {
+    text-align: center;
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.slip-header h2 {
+    margin: 0;
+    color: #1a1a2e;
+    font-weight: 700;
+}
+
+.slip-header p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.token-badge {
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #7c3aed
+    );
+    color: white;
+    text-align: center;
+    padding: 18px;
+    border-radius: 10px;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+.info-table th,
+.info-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+}
+
+.info-table th {
+    background: #f8f9fa;
+    width: 20%;
+    text-align: left;
+}
+
+.prescription-box {
+    margin-top: 25px;
+}
+
+.prescription-box h4 {
+    margin-bottom: 10px;
+    color: #1a1a2e;
+}
+
+.prescription-area {
+    height: 700px;
+    border: 2px dashed #bbb;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.signature-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.signature-box {
+    width: 250px;
+    text-align: center;
+}
+
+.signature-line {
+    border-top: 1px solid #000;
+    margin-top: 60px;
+}
+
+.slip-footer {
+    text-align: center;
+    border-top: 1px solid #ddd;
+    margin-top: 25px;
+    padding-top: 15px;
+    color: #666;
+}
+
+</style>
+
+<div class="container-fluid">
+
+    <div class="no-print text-center mb-4">
+
+        <a href="{{ url_for('opd.staff_panel') }}"
+           class="btn btn-outline-primary">
+
+            ← Back To Staff Panel
+
+        </a>
+
+        <button onclick="window.print()"
+                class="btn btn-primary">
+
+            🖨 Print OPD Slip
+
+        </button>
+
+    </div>
+
+    <div class="opd-slip">
+
+        <div class="slip-header">
+
+            <h2>SAHARA HOSPITAL</h2>
+
+            <p>Professional Healthcare Services</p>
+
+            <p>
+                <strong>OPD Registration Slip</strong>
+            </p>
+
+        </div>
+
+        <div class="token-badge">
+
+            TOKEN #{{ visit.token_number }}
+
+        </div>
+
+        <table class="info-table">
+
+            <tr>
+
+                <th>Date</th>
+
+                <td>
+                    {{ visit.visit_date.strftime('%d-%m-%Y') }}
+                </td>
+
+                <th>Time</th>
+
+                <td>
+                    {{ visit.check_in_time.strftime('%H:%M') if visit.check_in_time else '-' }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>Patient Name</th>
+
+                <td>
+                    {{ visit.patient.full_name }}
+                </td>
+
+                <th>Age / Gender</th>
+
+                <td>
+                    {{ visit.patient.age }}
+                    /
+                    {{ visit.patient.gender }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>Phone</th>
+
+                <td>
+                    {{ visit.patient.phone }}
+                </td>
+
+                <th>Department</th>
+
+                <td>
+                    {{ visit.doctor.department.department_name }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>Doctor</th>
+
+                <td colspan="3">
+                    Dr. {{ visit.doctor.name }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>Chief Complaint</th>
+
+                <td colspan="3">
+                    {{ visit.chief_complaint }}
+                </td>
+
+            </tr>
+
+        </table>
+
+        <div class="prescription-box">
+
+            <h4>
+                Doctor Notes / Prescription
+            </h4>
+
+            <div class="prescription-area"></div>
+
+        </div>
+
+        <div class="signature-row">
+
+            <div class="signature-box">
+
+                <div class="signature-line"></div>
+
+                Doctor Signature
+
+            </div>
+
+            <div class="signature-box">
+
+                <div class="signature-line"></div>
+
+                Staff Signature
+
+            </div>
+
+        </div>
+
+        <div class="slip-footer">
+
+            <p>
+                Please keep this slip with you until consultation is completed.
+            </p>
+
+            <p>
+                © {{ visit.visit_date.year }} Sahara Hospital
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

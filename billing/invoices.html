@@ -1,0 +1,79 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Invoice Logs - Sahara Hospital ERP{% endblock %}
+
+{% block admin_content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h3 class="mb-1 fw-bold text-dark">Patient Invoice Registry</h3>
+        <p class="text-muted mb-0">Complete historical logs of patient invoices, payment status, and diagnostic test/pharmacy billing.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('billing.create') }}" class="btn btn-primary px-3 rounded-pill">
+            <i class="fa-solid fa-plus me-1"></i> Custom Invoice Builder
+        </a>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Invoice No.</th>
+                    <th>Billing Date</th>
+                    <th>Patient Name</th>
+                    <th>Subtotal</th>
+                    <th>Tax (GST)</th>
+                    <th>Discount</th>
+                    <th>Net Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td class="fw-bold font-monospace">{{ invoice.invoice_number }}</td>
+                    <td><i class="fa-regular fa-calendar me-1 text-muted"></i> {{ invoice.invoice_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="fw-bold text-indigo">{{ invoice.patient.full_name }}</td>
+                    <td>₹{{ "%.2f"|format(invoice.subtotal) }}</td>
+                    <td>₹{{ "%.2f"|format(invoice.tax) }}</td>
+                    <td class="text-danger">-₹{{ "%.2f"|format(invoice.discount) }}</td>
+                    <td class="fw-bold text-dark">₹{{ "%.2f"|format(invoice.total_amount) }}</td>
+                    <td>
+                        {% if invoice.payment_method %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill">{{ invoice.payment_method.upper() }}</span>
+                        {% else %}
+                            <span class="text-muted italic">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if invoice.payment_status == 'paid' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Paid</span>
+                        {% else %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill fw-bold">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group gap-2">
+                            <a href="{{ url_for('billing.view_invoice', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="fa-solid fa-eye"></i> View
+                            </a>
+                            <a href="{{ url_for('billing.print_invoice', invoice_id=invoice.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                <i class="fa-solid fa-print"></i> Print
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">No invoices found in registry.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

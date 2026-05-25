@@ -1,0 +1,155 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Create Invoice{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Create Invoice</h2>
+    
+    <div class="glass-card mb-4">
+        <form method="post">
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Patient</label>
+                    <select name="patient_id" id="patient_id" class="form-select" required>
+                        <option value="" disabled selected>Select Patient</option>
+                        {% for p in patients %}
+                        <option value="{{ p.id }}">{{ p.full_name }} (ID: {{ p.id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Appointment (optional)</label>
+                    <select name="appointment_id" id="appointment_id" class="form-select">
+                        <option value="">-- None --</option>
+                        {% for a in appointments %}
+                        <option value="{{ a.id }}">Appt #{{ a.id }} - {{ a.appointment_date }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">OPD Visit (optional)</label>
+                    <select name="opd_visit_id" id="opd_visit_id" class="form-select">
+                        <option value="">-- None --</option>
+                        {% for o in opd_visits %}
+                        <option value="{{ o.id }}">Visit #{{ o.id }} - {{ o.visit_date }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <hr>
+            <h5 class="mb-3">Invoice Items</h5>
+            <div id="items-container">
+                <div class="row g-2 mb-2 item-row">
+                    <div class="col-md-4">
+                        <input type="text" name="item_name[]" placeholder="Item name" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="item_type[]" placeholder="Type" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="quantity[]" placeholder="Qty" class="form-control" value="1" min="1" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" step="0.01" name="unit_price[]" placeholder="Unit price" class="form-control" required>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.item-row').remove()">✕</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mb-3" onclick="addItemRow()">+ Add Item</button>
+            
+            <hr>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Discount</label>
+                    <input type="number" step="0.01" name="discount" id="discount" class="form-control" value="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Payment Method</label>
+                    <select name="payment_method" class="form-select">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="online">Online</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Notes</label>
+                    <input type="text" name="notes" class="form-control" placeholder="Optional">
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create Invoice</button>
+                <a href="{{ url_for('billing.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="glass-card">
+        <h5 class="mb-3">Recent Invoices</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Patient</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if invoices %}
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td>{{ invoice.invoice_number }}</td>
+                            <td>{{ invoice.patient.full_name if invoice.patient else 'N/A' }}</td>
+                            <td>₹{{ "%.2f"|format(invoice.total_amount) }}</td>
+                            <td>
+                                {% if invoice.payment_status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') if invoice.invoice_date else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-3">No recent invoices</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function addItemRow(){
+  const container=document.getElementById('items-container');
+  const row=document.createElement('div');
+  row.className='row g-2 mb-2 item-row';
+  row.innerHTML=`
+    <div class="col-md-4">
+        <input type="text" name="item_name[]" placeholder="Item name" class="form-control" required>
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="item_type[]" placeholder="Type" class="form-control" required>
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="quantity[]" placeholder="Qty" class="form-control" value="1" min="1" required>
+    </div>
+    <div class="col-md-3">
+        <input type="number" step="0.01" name="unit_price[]" placeholder="Unit price" class="form-control" required>
+    </div>
+    <div class="col-md-1">
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.item-row').remove()">✕</button>
+    </div>`;
+  container.appendChild(row);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Edit Inventory Item{% endblock %}
+
+{% block content %}
+<div class='container'>
+  <h1>Edit Item</h1>
+  <!-- Real form for editing an inventory item -->
+  <form method='POST'>
+    <div class='mb-3'>
+      <label class='form-label'>Item Name</label>
+      <input type='text' name='name' class='form-control' required />
+    </div>
+    <div class='mb-3'>
+      <label class='form-label'>Quantity</label>
+      <input type='number' name='quantity' class='form-control' required />
+    </div>
+    <div class='mb-3'>
+      <label class='form-label'>Purchase Price</label>
+      <input type='number' step='0.01' name='price' class='form-control' required />
+    </div>
+    <button type='submit' class='btn btn-primary'>Update</button>
+  </form>
+</div>
+{% endblock %}

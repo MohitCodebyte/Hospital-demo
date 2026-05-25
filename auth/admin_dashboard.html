@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Sahara Hospital{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+.admin-header {
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">Admin Panel</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white active" href="{{ url_for('auth.admin_dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_doctors') }}">
+                <i class="fas fa-user-md me-2"></i>Doctors
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_departments') }}">
+                <i class="fas fa-hospital me-2"></i>Departments
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_appointments') }}">
+                <i class="fas fa-calendar-check me-2"></i>Appointments
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_patients') }}">
+                <i class="fas fa-users me-2"></i>Patients
+            </a>
+
+            <a class="nav-link text-white-50"
+            href="{{ url_for('inventory.dashboard') }}">
+
+                <i class="fas fa-boxes me-2"></i>
+
+                Inventory
+
+            </a>
+
+            <a class="nav-link text-white-50"
+            href="{{ url_for('mrd.dashboard') }}">
+
+                <i class="fas fa-file-medical me-2"></i>
+
+                MRD
+
+            </a>
+
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_messages') }}">
+                <i class="fas fa-envelope me-2"></i>Messages
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_emergencies') }}">
+                <i class="fas fa-ambulance me-2"></i>Emergencies
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-content">
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="mb-0">Admin Dashboard</h2>
+                    <p class="text-muted mb-0">Welcome back, {{ session.get('admin_username', 'Admin') }}</p>
+                </div>
+                <div class="col-auto">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-primary">{{ session.get('admin_role', 'admin') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-2 col-md-4">
+                <div class="stat-card animate-on-scroll fade-in-up">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>{{ stats.doctors }}</h3>
+                    <p>Doctors</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.1s">
+                    <div class="stat-icon success">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>{{ stats.appointments }}</h3>
+                    <p>Appointments</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.2s">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <h3>{{ stats.departments }}</h3>
+                    <p>Departments</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.3s">
+                    <div class="stat-icon info">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>{{ stats.patients }}</h3>
+                    <p>Patients</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.4s">
+                    <div class="stat-icon" style="background: rgba(253, 126, 20, 0.1); color: #fd7e14;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>{{ stats.messages }}</h3>
+                    <p>Messages</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.5s">
+                    <div class="stat-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                        <i class="fas fa-ambulance"></i>
+                    </div>
+                    <h3>{{ stats.emergencies }}</h3>
+                    <p>Emergencies</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="glass-card mb-4 animate-on-scroll fade-in-up">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Recent Appointments</h4>
+                <a href="{{ url_for('admin.list_appointments') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in recent_appointments %}
+                        <tr>
+                            <td>{{ appointment.patient.full_name }}</td>
+                            <td>{{ appointment.doctor.name }}</td>
+                            <td>{{ appointment.appointment_date.strftime('%Y-%m-%d') }} {{ appointment.appointment_time.strftime('%H:%M') }}</td>
+                            <td><span class="badge badge-{{ 'success' if appointment.status == 'confirmed' else 'pending' }}">{{ appointment.status }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No recent appointments</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Messages -->
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="glass-card animate-on-scroll fade-in-up">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4>Recent Messages</h4>
+                        <a href="{{ url_for('admin.list_messages') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for message in recent_messages %}
+                        <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="text-white fw-bold">{{ message.name[0] }}</span>
+                            </div>
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">{{ message.name }}</h6>
+                                    <p class="mb-0 opacity-75 small">{{ message.subject or 'No subject' }}</p>
+                                </div>
+                                <small class="opacity-50 text-nowrap">{{ message.created_at.strftime('%H:%M') }}</small>
+                            </div>
+                        </a>
+                        {% else %}
+                        <div class="text-center py-4 text-muted">No recent messages</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="glass-card animate-on-scroll fade-in-up" style="animation-delay: 0.1s">
+                    <h4 class="mb-4">Quick Actions</h4>
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('admin.add_doctor') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add New Doctor
+                        </a>
+                        <a href="{{ url_for('admin.add_department') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add New Department
+                        </a>
+                        <a href="{{ url_for('admin.list_patients') }}" class="btn btn-primary">
+                            <i class="fas fa-users me-2"></i>Manage Patients
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animated');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    animatedElements.forEach(el => observer.observe(el));
+});
+</script>
+
+<a href="{{ url_for('admin.add_doctor') }}" class="btn btn-primary">
+    <i class="fas fa-user-md me-2"></i>
+    Add Doctor Details
+</a>
+
+
+{% endblock %}

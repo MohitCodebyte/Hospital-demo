@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Print Invoice{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Invoice #{{ invoice.invoice_number }}</h2>
+  <table class="table table-bordered">
+    <tr><th>Patient</th><td>{{ invoice.patient.full_name }}</td></tr>
+    <tr><th>Date</th><td>{{ invoice.invoice_date }}</td></tr>
+    <tr><th>Status</th><td>{{ invoice.payment_status }}</td></tr>
+    <tr><th>Subtotal</th><td>{{ invoice.subtotal }}</td></tr>
+    <tr><th>Tax</th><td>{{ invoice.tax }}</td></tr>
+    <tr><th>Discount</th><td>{{ invoice.discount }}</td></tr>
+    <tr><th>Total</th><td>{{ invoice.total_amount }}</td></tr>
+  </table>
+  <h4 class="mt-4">Items</h4>
+  <table class="table table-striped">
+    <thead><tr><th>Name</th><th>Type</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+    <tbody>
+    {% for item in invoice.items %}
+      <tr>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.item_type }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.unit_price }}</td>
+        <td>{{ item.total_price }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

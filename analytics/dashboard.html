@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard - Sahara Hospital{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">Analytics</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white active" href="{{ url_for('analytics.dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('analytics.patients') }}">
+                <i class="fas fa-users me-2"></i>Patient Analytics
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('analytics.appointments') }}">
+                <i class="fas fa-calendar me-2"></i>Appointment Analytics
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('analytics.revenue') }}">
+                <i class="fas fa-dollar-sign me-2"></i>Revenue Analytics
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('analytics.doctors') }}">
+                <i class="fas fa-user-md me-2"></i>Doctor Performance
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('auth.admin_dashboard') }}">
+                <i class="fas fa-cog me-2"></i>Admin Panel
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <h2 class="mb-4">Analytics Dashboard</h2>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>{{ total_patients }}</h3>
+                    <p>Total Patients</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.1s">
+                    <div class="stat-icon success">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>{{ total_appointments }}</h3>
+                    <p>Total Appointments</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.2s">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3>${{ total_revenue|round(2) }}</h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.3s">
+                    <div class="stat-icon info">
+                        <i class="fas fa-prescription"></i>
+                    </div>
+                    <h3>{{ total_prescriptions }}</h3>
+                    <p>Prescriptions</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="glass-card animate-on-scroll fade-in-up">
+                    <h4 class="mb-4">Doctor Performance</h4>
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <th>Specialization</th>
+                                    <th>Appointments</th>
+                                    <th>Prescriptions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in doctor_stats %}
+                                <tr>
+                                    <td>{{ stat.name }}</td>
+                                    <td>{{ stat.specialization }}</td>
+                                    <td>{{ stat.appointment_count or 0 }}</td>
+                                    <td>{{ stat.prescription_count or 0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="glass-card animate-on-scroll fade-in-up" style="animation-delay: 0.1s">
+                    <h4 class="mb-4">Department Statistics</h4>
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Doctors</th>
+                                    <th>Appointments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in dept_stats %}
+                                <tr>
+                                    <td>{{ stat.department_name }}</td>
+                                    <td>{{ stat.doctor_count or 0 }}</td>
+                                    <td>{{ stat.appointment_count or 0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

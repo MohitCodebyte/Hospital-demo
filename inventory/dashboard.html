@@ -1,0 +1,181 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Inventory Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/inventory.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="inventory-wrapper">
+
+    <div class="inventory-header">
+
+        <div>
+            <h1>Inventory Management</h1>
+            <p>Monitor stock, inventory health and hospital supplies</p>
+        </div>
+
+        <a href="{{ url_for('inventory.add_item') }}"
+           class="btn btn-success add-btn">
+
+            <i class="fas fa-plus"></i>
+            Add Item
+
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-3">
+
+            <div class="stats-card total-card">
+
+                <div class="icon-box">
+                    <i class="fas fa-boxes"></i>
+                </div>
+
+                <h6>Total Items</h6>
+
+                <h2>{{ total_items }}</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            <div class="stats-card low-stock-card">
+
+                <div class="icon-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+
+                <h6>Low Stock</h6>
+
+                <h2>{{ low_stock_count }}</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            <div class="stats-card supplier-card">
+
+                <div class="icon-box">
+                    <i class="fas fa-truck"></i>
+                </div>
+
+                <h6>Suppliers</h6>
+
+                <h2>12</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            <div class="stats-card expiry-card">
+
+                <div class="icon-box">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+
+                <h6>Expiring Soon</h6>
+
+                <h2>5</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="recent-stock mt-5">
+
+        <div class="card shadow border-0">
+
+            <div class="card-header bg-white">
+
+                <h4 class="mb-0">
+                    Recent Inventory Items
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for item in items %}
+
+                    <tr>
+
+                        <td>{{ item.item_code }}</td>
+
+                        <td>{{ item.item_name }}</td>
+
+                        <td>{{ item.category }}</td>
+
+                        <td>{{ item.quantity }}</td>
+
+                        <td>
+
+                            {% if item.low_stock %}
+
+                            <span class="badge bg-danger">
+
+                                Low Stock
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-success">
+
+                                Available
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

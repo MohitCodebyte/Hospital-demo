@@ -1,0 +1,221 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Create Lab Order - Sahara Hospital ERP{% endblock %}
+
+{% block admin_content %}
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h3 class="mb-1 fw-bold text-dark">Create Diagnostics Lab Order</h3>
+        <p class="text-muted mb-0">Record patient test requests, specify referring doctor, and auto-generate lab invoice.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('laboratory.orders') }}" class="btn btn-outline-secondary px-3 rounded-pill">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Registry
+        </a>
+    </div>
+</div>
+
+<div class="glass-card">
+    <form method="POST" id="labOrderForm">
+        <!-- Order Metadata -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label for="patient_id" class="form-label fw-semibold">Patient Name *</label>
+                <select class="form-select rounded-3" id="patient_id" name="patient_id" required>
+                    <option value="" disabled selected>Select Patient</option>
+                    {% for patient in patients %}
+                    <option value="{{ patient.id }}">{{ patient.full_name }} (Phone: {{ patient.phone }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="doctor_id" class="form-label fw-semibold">Referring Doctor (Optional)</label>
+                <select class="form-select rounded-3" id="doctor_id" name="doctor_id">
+                    <option value="">Self Request / Walk-in</option>
+                    {% for doc in doctors %}
+                    <option value="{{ doc.id }}">{{ doc.name }} ({{ doc.specialization }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="order_date" class="form-label fw-semibold">Order Date *</label>
+                <input type="date" class="form-control rounded-3" id="order_date" name="order_date" required>
+            </div>
+        </div>
+
+        <h5 class="fw-bold mb-3 border-bottom pb-2 text-primary">Requested Lab Tests</h5>
+
+        <!-- Multi-item table -->
+        <div class="table-responsive mb-3">
+            <table class="table table-bordered align-middle" id="itemsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70%;">Diagnostic Test *</th>
+                        <th style="width: 25%;">Rate (₹)</th>
+                        <th style="width: 5%;"></th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr class="item-row">
+                        <td>
+                            <select class="form-select rounded-3 test-select" name="test_id[]" required>
+                                <option value="" disabled selected>Select Diagnostic Test</option>
+                                {% for test in tests %}
+                                <option value="{{ test.id }}" data-price="{{ test.rate }}">
+                                    {{ test.test_name }} [{{ test.category }}] (Ref: {{ test.normal_range }} {{ test.unit }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <span class="row-price fw-bold text-dark">₹0.00</span>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-circle remove-row-btn"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button type="button" class="btn btn-outline-indigo px-3 rounded-pill mb-4" id="addRowBtn">
+            <i class="fa-solid fa-plus me-1"></i> Add Another Test
+        </button>
+
+        <!-- Calculations -->
+        <div class="row justify-content-end">
+            <div class="col-md-5">
+                <div class="glass-card p-3" style="background: rgba(255, 255, 255, 0.65);">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal (Test Rates):</span>
+                        <span class="fw-bold" id="subtotalVal">₹0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">GST (18%):</span>
+                        <span class="fw-semibold" id="gstVal">₹0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fs-5 fw-bold text-dark">Total Bill Amount:</span>
+                        <span class="fs-4 fw-bold text-success" id="totalVal">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <a href="{{ url_for('laboratory.orders') }}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                <i class="fa-solid fa-file-invoice me-1"></i> Place Order & Generate Invoice
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Template for cloning rows -->
+<table style="display: none;">
+    <tbody id="rowTemplate">
+        <tr class="item-row">
+            <td>
+                <select class="form-select rounded-3 test-select" name="test_id[]" required>
+                    <option value="" disabled selected>Select Diagnostic Test</option>
+                    {% for test in tests %}
+                    <option value="{{ test.id }}" data-price="{{ test.rate }}">
+                        {{ test.test_name }} [{{ test.category }}] (Ref: {{ test.normal_range }} {{ test.unit }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <span class="row-price fw-bold text-dark">₹0.00</span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle remove-row-btn"><i class="fa-solid fa-trash-can"></i></button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set today's date in date picker
+        const dateInput = document.getElementById('order_date');
+        if (!dateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+
+        const itemsBody = document.getElementById('itemsBody');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const rowTemplate = document.getElementById('rowTemplate').querySelector('tr');
+
+        // Add dynamic row
+        addRowBtn.addEventListener('click', function() {
+            const newRow = rowTemplate.cloneNode(true);
+            itemsBody.appendChild(newRow);
+            bindRowEvents(newRow);
+            calculateTotals();
+        });
+
+        // Remove row
+        itemsBody.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-row-btn')) {
+                const row = e.target.closest('.item-row');
+                if (itemsBody.querySelectorAll('.item-row').length > 1) {
+                    row.remove();
+                    calculateTotals();
+                } else {
+                    alert("At least one diagnostic test is required!");
+                }
+            }
+        });
+
+        // Bind events to initial rows
+        itemsBody.querySelectorAll('.item-row').forEach(bindRowEvents);
+
+        function bindRowEvents(row) {
+            const testSelect = row.querySelector('.test-select');
+            const rowPriceSpan = row.querySelector('.row-price');
+
+            testSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                rowPriceSpan.textContent = '₹' + price.toFixed(2);
+                calculateTotals();
+            });
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            itemsBody.querySelectorAll('.item-row').forEach(row => {
+                const testSelect = row.querySelector('.test-select');
+                if (testSelect.selectedIndex > 0) {
+                    const selectedOption = testSelect.options[testSelect.selectedIndex];
+                    const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                    subtotal += price;
+                }
+            });
+
+            const gst = subtotal * 0.18;
+            const total = subtotal + gst;
+
+            document.getElementById('subtotalVal').textContent = '₹' + subtotal.toFixed(2);
+            document.getElementById('gstVal').textContent = '₹' + gst.toFixed(2);
+            document.getElementById('totalVal').textContent = '₹' + total.toFixed(2);
+        }
+    });
+</script>
+<style>
+    .btn-outline-indigo {
+        color: #4f46e5;
+        border-color: #4f46e5;
+    }
+    .btn-outline-indigo:hover {
+        background-color: #4f46e5;
+        color: #fff;
+    }
+</style>
+{% endblock %}

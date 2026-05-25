@@ -1,0 +1,139 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Billing Reports{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Billing Reports</h2>
+    
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Today's Revenue</h5>
+                <p class="display-6 text-primary">₹{{ "%.2f"|format(today_revenue) }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Monthly Revenue</h5>
+                <p class="display-6 text-success">₹{{ "%.2f"|format(monthly_revenue) }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Pending Amount</h5>
+                <p class="display-6 text-warning">₹{{ "%.2f"|format(pending_amount) }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Collected Amount</h5>
+                <p class="display-6 text-info">₹{{ "%.2f"|format(collected_amount) }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Report Filters</h5>
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">From Date</label>
+                <input type="date" name="from_date" class="form-control" value="{{ request.args.get('from_date', '') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">To Date</label>
+                <input type="date" name="to_date" class="form-control" value="{{ request.args.get('to_date', '') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Doctor</label>
+                <select name="doctor_id" class="form-select">
+                    <option value="">All Doctors</option>
+                    {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}" {% if request.args.get('doctor_id') == doctor.id|string %}selected{% endif %}>{{ doctor.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Department</label>
+                <select name="department_id" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if request.args.get('department_id') == dept.id|string %}selected{% endif %}>{{ dept.department_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="{{ url_for('billing.reports') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Export Options -->
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Export Reports</h5>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('billing.export_pdf', **request.args) }}" class="btn btn-outline-primary">
+                <i class="fa-solid fa-file-pdf me-2"></i>Export as PDF
+            </a>
+            <a href="{{ url_for('billing.export_excel', **request.args) }}" class="btn btn-outline-success">
+                <i class="fa-solid fa-file-excel me-2"></i>Export as Excel
+            </a>
+            <a href="{{ url_for('billing.print_report', **request.args) }}" target="_blank" class="btn btn-outline-info">
+                <i class="fa-solid fa-print me-2"></i>Print Report
+            </a>
+        </div>
+    </div>
+    
+    <!-- Report Table -->
+    <div class="glass-card">
+        <h5 class="mb-3">Billing Transactions</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Department</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if invoices %}
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td><strong>{{ invoice.invoice_number }}</strong></td>
+                            <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') if invoice.invoice_date else 'N/A' }}</td>
+                            <td>{{ invoice.patient.full_name if invoice.patient else 'N/A' }}</td>
+                            <td>{{ invoice.appointment.doctor.full_name if invoice.appointment and invoice.appointment.doctor else 'N/A' }}</td>
+                            <td>{{ invoice.appointment.department.department_name if invoice.appointment and invoice.appointment.department else 'N/A' }}</td>
+                            <td>₹{{ "%.2f"|format(invoice.total_amount) }}</td>
+                            <td>
+                                {% if invoice.payment_status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ invoice.payment_method|upper if invoice.payment_method else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fa-solid fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No billing transactions found.</p>
+                                <small class="text-muted">Apply filters or select a different date range.</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

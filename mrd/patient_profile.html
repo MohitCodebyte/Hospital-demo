@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}
+Patient Medical Record
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/mrd.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="mrd-wrapper">
+
+    <!-- Header -->
+
+    <div class="mrd-header">
+
+        <div>
+
+            <h1>
+                Patient Medical Record
+            </h1>
+
+            <p>
+                Complete medical history and records
+            </p>
+
+        </div>
+
+        <a href="{{ url_for('mrd.patients') }}"
+           class="btn btn-primary">
+
+            <i class="fas fa-arrow-left me-2"></i>
+
+            Back to Records
+
+        </a>
+
+    </div>
+
+    <!-- Patient Info -->
+
+    <div class="card shadow border-0 mb-4">
+
+        <div class="card-header bg-primary text-white">
+
+            <h4 class="mb-0">
+
+                Patient Information
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <strong>Patient ID</strong><br>
+                    {{ patient.id }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Name</strong><br>
+                    {{ patient.full_name }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Gender</strong><br>
+                    {{ patient.gender }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Age</strong><br>
+                    {{ patient.age }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Phone</strong><br>
+                    {{ patient.phone }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Email</strong><br>
+                    {{ patient.email }}
+                </div>
+
+                <div class="col-md-12">
+                    <strong>Address</strong><br>
+                    {{ patient.address }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Appointment History -->
+
+    <div class="card shadow border-0 mb-4">
+
+        <div class="card-header bg-success text-white">
+
+            <h4 class="mb-0">
+
+                Appointment History
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if appointments %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Doctor</th>
+                            <th>Status</th>
+                            <th>Symptoms</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for appointment in appointments %}
+
+                    <tr>
+
+                        <td>{{ appointment.appointment_date }}</td>
+
+                        <td>{{ appointment.appointment_time }}</td>
+
+                        <td>{{ appointment.doctor.name }}</td>
+
+                        <td>{{ appointment.status }}</td>
+
+                        <td>{{ appointment.symptoms }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <p>No appointment records found.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- OPD Visits -->
+
+    <div class="card shadow border-0 mb-4">
+
+        <div class="card-header bg-warning">
+
+            <h4 class="mb-0">
+
+                OPD Visit History
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if visits %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Token</th>
+                            <th>Date</th>
+                            <th>Doctor</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for visit in visits %}
+
+                    <tr>
+
+                        <td>{{ visit.token_number }}</td>
+
+                        <td>{{ visit.visit_date }}</td>
+
+                        <td>{{ visit.doctor.name }}</td>
+
+                        <td>{{ visit.status }}</td>
+
+                        <td>{{ visit.notes }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <p>No OPD visit records found.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Prescriptions -->
+
+    <div class="card shadow border-0 mb-4">
+
+        <div class="card-header bg-danger text-white">
+
+            <h4 class="mb-0">
+
+                Prescription History
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if prescriptions %}
+
+            {% for prescription in prescriptions %}
+
+            <div class="border rounded p-3 mb-3">
+
+                <h5>
+
+                    {{ prescription.prescription_date }}
+
+                </h5>
+
+                <p>
+
+                    <strong>Doctor:</strong>
+                    {{ prescription.doctor.name }}
+
+                </p>
+
+                <p>
+
+                    <strong>Diagnosis:</strong>
+                    {{ prescription.diagnosis }}
+
+                </p>
+
+                <p>
+
+                    <strong>Notes:</strong>
+                    {{ prescription.notes }}
+
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <p>No prescription records found.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Medical Reports -->
+
+    <div class="card shadow border-0 mb-4">
+
+        <div class="card-header bg-info text-white">
+
+            <h4 class="mb-0">
+
+                Medical Reports
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if reports %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Description</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for report in reports %}
+
+                    <tr>
+
+                        <td>{{ report.report_title }}</td>
+
+                        <td>{{ report.report_type }}</td>
+
+                        <td>{{ report.report_date }}</td>
+
+                        <td>{{ report.description }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <p>No medical reports found.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Billing History -->
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-secondary text-white">
+
+            <h4 class="mb-0">
+
+                Billing History
+
+            </h4>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if invoices %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Invoice No.</th>
+                            <th>Date</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for invoice in invoices %}
+
+                    <tr>
+
+                        <td>{{ invoice.invoice_number }}</td>
+
+                        <td>{{ invoice.invoice_date }}</td>
+
+                        <td>₹ {{ invoice.total_amount }}</td>
+
+                        <td>{{ invoice.payment_status }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <p>No billing records found.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Patient Records{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Patient Medical Records</h2>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Total Patients</h5>
+                <p class="display-6 text-primary">{{ patients|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Active Patients</h5>
+                <p class="display-6 text-success">{{ patients|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Male Patients</h5>
+                <p class="display-6 text-warning">{{ patients|selectattr('gender', 'equalto', 'Male')|list|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Female Patients</h5>
+                <p class="display-6 text-info">{{ patients|selectattr('gender', 'equalto', 'Female')|list|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="glass-card mb-4">
+        <form method="GET">
+            <div class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" name="search" value="{{ search or '' }}" class="form-control" placeholder="Search by patient name...">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fa-solid fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="glass-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Patient Records</h5>
+            <span class="badge bg-primary">{{ patients|length }} Patients</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Age</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if patients %}
+                        {% for patient in patients %}
+                        <tr>
+                            <td><strong>#{{ patient.id }}</strong></td>
+                            <td><strong>{{ patient.full_name }}</strong></td>
+                            <td>{{ patient.email }}</td>
+                            <td>{{ patient.phone }}</td>
+                            <td><span class="badge bg-info">{{ patient.gender }}</span></td>
+                            <td>{{ patient.age }}</td>
+                            <td>{{ patient.created_at.strftime('%d-%m-%Y') if patient.created_at else 'N/A' }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="#" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-success">
+                                        <i class="fa-solid fa-history"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fa-solid fa-users fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No patient records found.</p>
+                                <small class="text-muted">Patient records will appear here when patients register.</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

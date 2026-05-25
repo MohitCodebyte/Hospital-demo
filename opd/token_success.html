@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}OPD Token Generated - Sahara Hospital{% endblock %}
+
+{% block content %}
+<style>
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    .token-card {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+    }
+}
+
+.token-card {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.token-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #1a1a2e;
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.token-details {
+    margin-bottom: 2rem;
+}
+
+.token-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.token-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.token-value {
+    color: #333;
+    font-weight: 500;
+}
+
+.qr-section {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.qr-section img {
+    max-width: 150px;
+    border: 2px solid #ddd;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.status-waiting {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-in-progress {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+</style>
+
+<div class="container py-5">
+    <div class="no-print mb-4 text-center">
+        <a href="{{ url_for('home.index') }}" class="btn btn-outline-primary">
+            <i class="fas fa-home me-2"></i>Back to Home
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print me-2"></i>Print Token
+        </button>
+    </div>
+
+    <div class="token-card animate-on-scroll fade-in-up">
+        <div class="text-center mb-4">
+            <h3 class="mb-2">SAHARA HOSPITAL</h3>
+            <p class="text-muted">Your OPD Token</p>
+        </div>
+
+        <div class="token-number">
+            {{ visit.token_number }}
+        </div>
+
+        <div class="token-details">
+            <div class="token-row">
+                <span class="token-label">Patient Name:</span>
+                <span class="token-value">{{ visit.patient.full_name }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Phone:</span>
+                <span class="token-value">{{ visit.patient.phone }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Department:</span>
+                <span class="token-value">{{ visit.doctor.department.department_name }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Doctor:</span>
+                <span class="token-value">Dr. {{ visit.doctor.full_name }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Date:</span>
+                <span class="token-value">{{ visit.visit_date.strftime('%Y-%m-%d') }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Check-in Time:</span>
+                <span class="token-value">{{ visit.check_in_time.strftime('%H:%M:%S') if visit.check_in_time else '-' }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Status:</span>
+                <span class="token-value">
+                    <span class="status-badge status-{{ visit.status }}">
+                        {{ visit.status|capitalize }}
+                    </span>
+                </span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Queue Position:</span>
+                <span class="token-value">{{ queue_position }}</span>
+            </div>
+            <div class="token-row">
+                <span class="token-label">Estimated Wait:</span>
+                <span class="token-value">{{ estimated_wait }} minutes</span>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <img src="{{ url_for('static', filename='uploads/qr/' + qr_filename) }}" alt="QR Code">
+            <p class="text-muted small mt-2">Scan for token details</p>
+        </div>
+
+        <div class="text-center mt-4">
+            <p class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Please wait for your turn. Your token will be called on the display screen.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Issue Stock{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Issue Stock</h2>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Total Issues</h5>
+                <p class="display-6 text-primary">{{ issues|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Today's Issues</h5>
+                <p class="display-6 text-success">{{ issues|selectattr('issue_date', 'equalto', today)|list|length if today else 0 }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Pending Issues</h5>
+                <p class="display-6 text-warning">{{ issues|selectattr('status', 'equalto', 'pending')|list|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Completed Issues</h5>
+                <p class="display-6 text-info">{{ issues|selectattr('status', 'equalto', 'completed')|list|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="glass-card mb-4">
+        <h5 class="mb-3">Issue Stock Form</h5>
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Department</label>
+                    <select class="form-select" name="department_id" required>
+                        <option value="" disabled selected>Select Department</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Item</label>
+                    <select class="form-select" name="item_id" required>
+                        <option value="" disabled selected>Select Item</option>
+                        {% for item in items %}
+                        <option value="{{ item.id }}" data-qty="{{ item.quantity }}">{{ item.item_name }} (Available: {{ item.quantity }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Available Stock</label>
+                    <input type="text" class="form-control" id="available-stock" readonly value="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Quantity to Issue</label>
+                    <input type="number" class="form-control" name="quantity" min="1" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Issue Date</label>
+                    <input type="date" class="form-control" name="issue_date" value="{{ today.strftime('%Y-%m-%d') if today else '' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Issued By</label>
+                    <input type="text" class="form-control" name="issued_by" placeholder="Staff name" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" required>
+                        <option value="pending" selected>Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Remarks</label>
+                    <textarea class="form-control" name="remarks" rows="2" placeholder="Optional remarks"></textarea>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Issue Stock
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="glass-card">
+        <h5 class="mb-3">Recent Issues</h5>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Issue ID</th>
+                        <th>Department</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Issue Date</th>
+                        <th>Issued By</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if issues %}
+                        {% for issue in issues %}
+                        <tr>
+                            <td>{{ issue.id }}</td>
+                            <td>{{ issue.department.department_name if issue.department else 'N/A' }}</td>
+                            <td>{{ issue.item.item_name if issue.item else 'N/A' }}</td>
+                            <td>{{ issue.quantity }}</td>
+                            <td>{{ issue.issue_date.strftime('%Y-%m-%d') if issue.issue_date else 'N/A' }}</td>
+                            <td>{{ issue.issued_by }}</td>
+                            <td>
+                                {% if issue.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif issue.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ issue.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ issue.remarks or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fa-solid fa-truck-ramp-box fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No stock issues found.</p>
+                                <small class="text-muted">Issue stock to departments to track inventory movement.</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itemSelect = document.querySelector('select[name="item_id"]');
+    const availableStockInput = document.getElementById('available-stock');
+    
+    itemSelect.addEventListener('change', function() {
+        const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+        const availableQty = selectedOption.getAttribute('data-qty') || '0';
+        availableStockInput.value = availableQty;
+    });
+});
+</script>
+{% endblock %}

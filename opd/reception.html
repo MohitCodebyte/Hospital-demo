@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}OPD Reception - Sahara Hospital{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">OPD Reception</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white active" href="{{ url_for('opd.reception') }}">
+                <i class="fas fa-desktop me-2"></i>Live Queue
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.staff_panel') }}">
+                <i class="fas fa-search me-2"></i>Search Patient
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.queue') }}">
+                <i class="fas fa-users me-2"></i>Patient Queue
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.fees') }}">
+                <i class="fas fa-dollar-sign me-2"></i>OPD Fees
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <h2 class="mb-4">OPD Reception</h2>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>{{ waiting_count }}</h3>
+                    <p>Waiting</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.1s">
+                    <div class="stat-icon info">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <h3>{{ in_progress_count }}</h3>
+                    <p>In Progress</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.2s">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>{{ completed_count }}</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-on-scroll fade-in-up" style="animation-delay: 0.3s">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3>{{ waiting_count + in_progress_count }}</h3>
+                    <p>Active Queue</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card animate-on-scroll fade-in-up">
+            <h4 class="mb-4">Live Queue</h4>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Patient</th>
+                            <th>Department</th>
+                            <th>Doctor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visit in live_queue %}
+                        <tr>
+                            <td><strong>{{ visit.token_number }}</strong></td>
+                            <td>{{ visit.patient.full_name }}</td>
+                            <td>{{ visit.doctor.department.department_name }}</td>
+                            <td>Dr. {{ visit.doctor.name }}</td>
+                            <td>
+                                <span class="badge badge-{{ 'warning' if visit.status == 'waiting' else 'info' if visit.status == 'in_progress' else 'success' }}">
+                                    {{ visit.status|capitalize }}
+                                </span>
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('opd.update_status', visit_id=visit.id) }}" class="d-inline">
+                                    <select name="status" class="form-select form-select-sm d-inline w-auto me-2">
+                                        <option value="waiting" {% if visit.status == 'waiting' %}selected{% endif %}>Waiting</option>
+                                        <option value="in_progress" {% if visit.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                        <option value="completed" {% if visit.status == 'completed' %}selected{% endif %}>Completed</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('opd.assign_doctor', visit_id=visit.id) }}" class="d-inline">
+                                    <select name="doctor_id" class="form-select form-select-sm d-inline w-auto me-2">
+                                        {% for doc in doctors %}
+                                        <option value="{{ doc.id }}" {% if visit.doctor_id == doc.id %}selected{% endif %}>Dr. {{ doc.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Assign</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No patients in queue</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card animate-on-scroll fade-in-up mt-4">
+            <h4 class="mb-4">Call Next Patient by Department</h4>
+            <div class="row g-3">
+                {% for dept in departments %}
+                <div class="col-md-4">
+                    <a href="{{ url_for('opd.call_next', department_id=dept.id) }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-bullhorn me-2"></i>Call Next - {{ dept.department_name }}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fetchPatient() {
+    const searchTerm = document.getElementById('searchPatient').value;
+    if (!searchTerm) {
+        alert('Please enter patient ID, email, or phone');
+        return;
+    }
+    
+    fetch('{{ url_for("opd.fetch_patient") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'search_term=' + encodeURIComponent(searchTerm)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('patientDetails').style.display = 'block';
+            document.getElementById('patientName').textContent = data.patient.name;
+            document.getElementById('patientAge').textContent = data.patient.age;
+            document.getElementById('patientGender').textContent = data.patient.gender;
+            document.getElementById('patientPhone').textContent = data.patient.phone;
+            document.getElementById('patientAddress').textContent = data.patient.address || 'N/A';
+            document.getElementById('patientId').value = data.patient.id;
+        } else {
+            alert(data.message);
+            document.getElementById('patientDetails').style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error fetching patient details');
+    });
+}
+
+document.getElementById('departmentSelect').addEventListener('change', function() {
+    const departmentId = this.value;
+    const doctorSelect = document.getElementById('doctorSelect');
+    
+    if (departmentId) {
+        fetch('/api/doctors/' + departmentId)
+            .then(response => response.json())
+            .then(data => {
+                doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+                data.doctors.forEach(doctor => {
+                    doctorSelect.innerHTML += `<option value="${doctor.id}">${doctor.name} - ${doctor.specialization}</option>`;
+                });
+            });
+    } else {
+        doctorSelect.innerHTML = '<option value="">Select Department First</option>';
+    }
+});
+</script>
+{% endblock %}

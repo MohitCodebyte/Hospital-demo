@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Staff OPD Panel - Sahara Hospital{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">Staff OPD Panel</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white active" href="{{ url_for('opd.staff_panel') }}">
+                <i class="fas fa-search me-2"></i>Search Patient
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.reception') }}">
+                <i class="fas fa-desktop me-2"></i>Live Queue
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.fees') }}">
+                <i class="fas fa-dollar-sign me-2"></i>OPD Fees
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <h2 class="mb-4">Staff OPD Panel</h2>
+
+        <div class="glass-card animate-on-scroll fade-in-up">
+            <h4 class="mb-4">Search Patient by Token Number</h4>
+            <form method="POST" action="{{ url_for('opd.search_by_token') }}">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="token_number" class="form-control" 
+                               placeholder="Enter OPD Token Number (e.g., OPD-101)" required>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% if patient %}
+        <div class="glass-card animate-on-scroll fade-in-up mt-4">
+            <h4 class="mb-4">Patient Details</h4>
+           <form method="POST" action="{{ url_for('opd.update_patient_details', visit_id=patient.visit_id if patient.visit_id else patient.id) }}">
+            <input type="hidden" name="visit_id" value="{{ patient.visit_id if patient.visit_id else patient.id }}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Token Number</label>
+                        <input type="text" class="form-control" value="{{ patient.token_number }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <span class="badge badge-{{ 'warning' if patient.status == 'waiting' else 'info' if patient.status == 'in_progress' else 'success' }} d-block p-2 text-center">
+                            {{ patient.status|capitalize }}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Patient Name</label>
+                        <input type="text" name="full_name" class="form-control" value="{{ patient.patient.full_name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control" value="{{ patient.patient.phone }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Gender</label>
+                        <select name="gender" class="form-select">
+                            <option value="Male" {% if patient.patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if patient.patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if patient.patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Age</label>
+                        <input type="number" name="age" class="form-control" value="{{ patient.patient.age }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Department</label>
+                    <select name="department_id" class="form-select">
+
+                        {% for dept in departments %}
+
+                        <option
+                            value="{{ dept.id }}"
+                            {% if patient.doctor and patient.doctor.department and patient.doctor.department.id == dept.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ dept.department_name }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Symptoms</label>
+                        <textarea name="symptoms" class="form-control" rows="2">{{ patient.chief_complaint }}</textarea>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Check-in Time</label>
+                        <input type="text" class="form-control" value="{{ patient.check_in_time.strftime('%H:%M:%S') if patient.check_in_time else '-' }}" readonly>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Patient Details
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <h5 class="mb-3">Staff Actions</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Update Status</label>
+                    <form method="POST" action="{{ url_for('opd.update_status', visit_id=patient.id) }}">
+                        <div class="input-group">
+                            <select name="status" class="form-select">
+                                <option value="waiting" {% if patient.status == 'waiting' %}selected{% endif %}>Waiting</option>
+                                <option value="in_progress" {% if patient.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="completed" {% if patient.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit" class="btn btn-success">Update</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Print Actions</label>
+                    <div class="input-group">
+                        <a href="{{ url_for('opd.generate_opd_slip', visit_id=patient.id) }}" class="btn btn-outline-primary flex-fill">
+                            <i class="fas fa-print me-2"></i>OPD Slip
+                        </a>
+                        <button class="btn btn-outline-secondary flex-fill" disabled title="Coming Soon">
+                            <i class="fas fa-file-prescription me-2"></i>Prescription
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

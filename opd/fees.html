@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}OPD Fees - OPD Management{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">OPD Management</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white-50" href="{{ url_for('opd.dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.checkin') }}">
+                <i class="fas fa-user-check me-2"></i>Patient Check-in
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('opd.queue') }}">
+                <i class="fas fa-users me-2"></i>Patient Queue
+            </a>
+            <a class="nav-link text-white active" href="{{ url_for('opd.fees') }}">
+                <i class="fas fa-dollar-sign me-2"></i>OPD Fees
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>OPD Fees Management</h2>
+            <a href="{{ url_for('opd.dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        <div class="glass-card animate-on-scroll fade-in-up mb-4">
+            <h4 class="mb-4">Add New Fee</h4>
+            <form method="POST" action="{{ url_for('opd.add_fee') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Department *</label>
+                        <select name="department_id" class="form-select" required>
+                            <option value="">Select Department</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept.id }}">{{ dept.department_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Doctor (Optional)</label>
+                        <select name="doctor_id" class="form-select">
+                            <option value="">All Doctors</option>
+                            {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Fee Name *</label>
+                        <input type="text" name="fee_name" class="form-control" required placeholder="e.g., Consultation">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Fee Amount *</label>
+                        <input type="number" step="0.01" name="fee_amount" class="form-control" required placeholder="500.00">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add Fee
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="glass-card animate-on-scroll fade-in-up">
+            <h4 class="mb-4">Active Fees</h4>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Doctor</th>
+                            <th>Fee Name</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fee in fees %}
+                        <tr>
+                            <td>{{ fee.department.department_name }}</td>
+                            <td>{{ fee.doctor.name if fee.doctor else 'All Doctors' }}</td>
+                            <td>{{ fee.fee_name }}</td>
+                            <td>${{ fee.fee_amount }}</td>
+                            <td>
+                                <a href="{{ url_for('opd.deactivate_fee', fee_id=fee.id) }}" class="btn btn-sm btn-outline-danger">
+                                    Deactivate
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No active fees found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Patients - Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: #1a1a2e;
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 991px) {
+    .admin-sidebar {
+        width: 100%;
+        position: relative;
+    }
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="admin-layout">
+    <div class="admin-sidebar">
+        <div class="text-center mb-4">
+            <h4 class="text-white">Sahara Hospital</h4>
+            <p class="text-white-50 small">Admin Panel</p>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white-50" href="{{ url_for('auth.admin_dashboard') }}">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_doctors') }}">
+                <i class="fas fa-user-md me-2"></i>Doctors
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_departments') }}">
+                <i class="fas fa-hospital me-2"></i>Departments
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_appointments') }}">
+                <i class="fas fa-calendar-check me-2"></i>Appointments
+            </a>
+            <a class="nav-link text-white active" href="{{ url_for('admin.list_patients') }}">
+                <i class="fas fa-users me-2"></i>Patients
+            </a>
+            <a class="nav-link text-white-50" href="{{ url_for('admin.list_messages') }}">
+                <i class="fas fa-envelope me-2"></i>Messages
+            </a>
+            <hr class="border-secondary my-3">
+            <a class="nav-link text-white-50" href="{{ url_for('home.index') }}">
+                <i class="fas fa-home me-2"></i>Back to Website
+            </a>
+            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        <h2 class="mb-4">Manage Users</h2>
+
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Appointments</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.full_name }}</td>
+                            <td>{{ patient.email }}</td>
+                            <td>{{ patient.phone }}</td>
+                            <td>{{ patient.gender }}</td>
+                            <td>{{ patient.age }}</td>
+                            <td>{{ patient.appointments|length }}</td>
+                            
+                        <td>
+
+                            <form method="POST"
+                                action="{{ url_for('auth.change_role', user_id=patient.id) }}">
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <select
+                                        name="role"
+                                        class="form-select form-select-sm"
+                                        onchange="this.form.submit()"
+                                        style="
+                                            min-width: 160px;
+                                            border-radius: 12px;
+                                            padding: 10px;
+                                            font-weight: 600;
+                                            cursor: pointer;
+                                        ">
+
+                                        <option value="patient"
+                                            {% if patient.role == 'patient' %}selected{% endif %}>
+                                            Patient
+                                        </option>
+
+                                        <option value="doctor"
+                                            {% if patient.role == 'doctor' %}selected{% endif %}>
+                                            Doctor
+                                        </option>
+
+                                        <option value="staff"
+                                            {% if patient.role == 'staff' %}selected{% endif %}>
+                                            Staff
+                                        </option>
+
+                                    </select>
+
+                                    <a href="{{ url_for(
+                                        'admin.delete_patient',
+                                        patient_id=patient.id
+                                    ) }}"
+                                    class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Are you sure?')">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </form>
+
+                        </td>
+
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No patients found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

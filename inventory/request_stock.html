@@ -1,0 +1,381 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Request Stock{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Request Stock</h2>
+
+    <!-- Overview Cards -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="col">
+            <div class="card text-bg-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Items</h5>
+                    <p class="card-text display-6">{{ stats.total_items_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Requests</h5>
+                    <p class="card-text display-6">{{ stats.pending }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-info h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Approved Requests</h5>
+                    <p class="card-text display-6">{{ stats.approved }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-warning h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected Requests</h5>
+                    <p class="card-text display-6">{{ stats.rejected }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-danger h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <p class="card-text display-6">{{ stats.low_stock }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-secondary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Departments</h5>
+                    <p class="card-text display-6">{{ stats.departments }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="search_item" class="form-control" placeholder="Search Item" value="{{ request.args.get('search_item','') }}">
+        </div>
+        <div class="col-md-3">
+            <select name="department_id" class="form-select">
+                <option value="" {% if not request.args.get('department_id') %}selected{% endif %}>All Departments</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if request.args.get('department_id') == dept.id|string %}selected{% endif %}>{{ dept.department_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="" {% if not request.args.get('status') %}selected{% endif %}>All Statuses</option>
+                <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if request.args.get('status') == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if request.args.get('status') == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="priority" class="form-select">
+                <option value="" {% if not request.args.get('priority') %}selected{% endif %}>All Priorities</option>
+                <option value="Normal" {% if request.args.get('priority') == 'Normal' %}selected{% endif %}>Normal</option>
+                <option value="Urgent" {% if request.args.get('priority') == 'Urgent' %}selected{% endif %}>Urgent</option>
+                <option value="Critical" {% if request.args.get('priority') == 'Critical' %}selected{% endif %}>Critical</option>
+            </select>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-outline-primary">Filter</button>
+        </div>
+    </form>
+
+    <!-- Request Form -->
+    <form method="post" class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Department</label>
+            <select name="department_id" class="form-select" required>
+                <option value="" disabled selected>Select Department</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.department_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Item</label>
+            <select name="item_id" class="form-select" required>
+                <option value="" disabled selected>Select Item</option>
+                {% for item in items %}
+                <option value="{{ item.id }}" data-qty="{{ item.quantity }}">{{ item.item_name }} ({{ item.quantity }} in stock)</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <span>Current Stock: <strong id="current-stock">0</strong></span>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Quantity</label>
+            <input type="number" name="quantity" class="form-control" min="1" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Priority</label>
+            <select name="priority" class="form-select" required>
+                <option value="Normal" selected>Normal</option>
+                <option value="Urgent">Urgent</option>
+                <option value="Critical">Critical</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Notes</label>
+            <input type="text" name="notes" class="form-control" placeholder="Optional">
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+    </form>
+
+    <hr class="my-4">
+    <h3>Pending Requests</h3>
+    {% if requests %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Department</th>
+                <th>Item</th>
+                <th>Available</th>
+                <th>Qty</th>
+                <th>Priority</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ req.department.department_name }}</td>
+                <td>{{ req.item.item_name }}</td>
+                <td>{{ req.item.quantity }}</td>
+                <td>{{ req.quantity }}</td>
+                <td>{{ req.priority }}</td>
+                <td>{{ req.request_date }}</td>
+                <td>
+                    {% if req.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif req.status == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                    {% else %}
+                    <span class="badge bg-danger">Rejected</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending requests.</p>
+    {% endif %}
+</div>
+{% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Stock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update current stock display when item changes
+        function updateCurrentStock() {
+            const select = document.querySelector('select[name="item_id"]');
+            const stockSpan = document.getElementById('current-stock');
+            const selectedOption = select.options[select.selectedIndex];
+            const qty = selectedOption.getAttribute('data-qty') || '0';
+            stockSpan.textContent = qty;
+        }
+        document.addEventListener('DOMContentLoaded', function(){
+            const itemSelect = document.querySelector('select[name="item_id"]');
+            itemSelect.addEventListener('change', updateCurrentStock);
+            updateCurrentStock();
+        });
+    </script>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">Request Stock</h2>
+
+    <!-- Overview Cards -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="col">
+            <div class="card text-bg-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Items</h5>
+                    <p class="card-text display-6">{{ stats.total_items_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Requests</h5>
+                    <p class="card-text display-6">{{ stats.pending }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-info h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Approved Requests</h5>
+                    <p class="card-text display-6">{{ stats.approved }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-warning h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected Requests</h5>
+                    <p class="card-text display-6">{{ stats.rejected }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-danger h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <p class="card-text display-6">{{ stats.low_stock }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-bg-secondary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Departments</h5>
+                    <p class="card-text display-6">{{ stats.departments }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="search_item" class="form-control" placeholder="Search Item" value="{{ request.args.get('search_item','') }}">
+        </div>
+        <div class="col-md-3">
+            <select name="department_id" class="form-select">
+                <option value="" {% if not request.args.get('department_id') %}selected{% endif %}>All Departments</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if request.args.get('department_id') == dept.id|string %}selected{% endif %}>{{ dept.department_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="" {% if not request.args.get('status') %}selected{% endif %}>All Statuses</option>
+                <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if request.args.get('status') == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if request.args.get('status') == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="priority" class="form-select">
+                <option value="" {% if not request.args.get('priority') %}selected{% endif %}>All Priorities</option>
+                <option value="Normal" {% if request.args.get('priority') == 'Normal' %}selected{% endif %}>Normal</option>
+                <option value="Urgent" {% if request.args.get('priority') == 'Urgent' %}selected{% endif %}>Urgent</option>
+                <option value="Critical" {% if request.args.get('priority') == 'Critical' %}selected{% endif %}>Critical</option>
+            </select>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-outline-primary">Filter</button>
+        </div>
+    </form>
+
+    <!-- Request Form -->
+    <form method="post" class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Department</label>
+            <select name="department_id" class="form-select" required>
+                <option value="" disabled selected>Select Department</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.department_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Item</label>
+            <select name="item_id" class="form-select" required>
+                <option value="" disabled selected>Select Item</option>
+                {% for item in items %}
+                <option value="{{ item.id }}" data-qty="{{ item.quantity }}">{{ item.item_name }} ({{ item.quantity }} in stock)</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <span>Current Stock: <strong id="current-stock">0</strong></span>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Quantity</label>
+            <input type="number" name="quantity" class="form-control" min="1" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Priority</label>
+            <select name="priority" class="form-select" required>
+                <option value="Normal" selected>Normal</option>
+                <option value="Urgent">Urgent</option>
+                <option value="Critical">Critical</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Notes</label>
+            <input type="text" name="notes" class="form-control" placeholder="Optional">
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+    </form>
+
+    <hr class="my-4">
+    <h3>Pending Requests</h3>
+    {% if requests %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Department</th>
+                <th>Item</th>
+                <th>Available</th>
+                <th>Qty</th>
+                <th>Priority</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ req.department.department_name }}</td>
+                <td>{{ req.item.item_name }}</td>
+                <td>{{ req.item.quantity }}</td>
+                <td>{{ req.quantity }}</td>
+                <td>{{ req.priority }}</td>
+                <td>{{ req.request_date }}</td>
+                <td>
+                    {% if req.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif req.status == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                    {% else %}
+                    <span class="badge bg-danger">Rejected</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending requests.</p>
+    {% endif %}
+</div>
+</body>
+</html>

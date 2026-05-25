@@ -1,0 +1,129 @@
+{% extends 'admin/layout.html' %}
+{% block title %}MRD Reports{% endblock %}
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">MRD Reports</h2>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Total Files</h5>
+                <p class="display-6 text-primary">0</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Active Files</h5>
+                <p class="display-6 text-success">0</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Archived Files</h5>
+                <p class="display-6 text-warning">0</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h5 class="card-title">Pending Requests</h5>
+                <p class="display-6 text-info">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="glass-card">
+                <h5 class="mb-3">Quick Reports</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary text-start">
+                        <i class="fa-solid fa-file-medical me-2"></i>File Movement Report
+                    </button>
+                    <button class="btn btn-outline-primary text-start">
+                        <i class="fa-solid fa-clock-rotate-left me-2"></i>File History Report
+                    </button>
+                    <button class="btn btn-outline-primary text-start">
+                        <i class="fa-solid fa-user-clock me-2"></i>File Retention Report
+                    </button>
+                    <button class="btn btn-outline-primary text-start">
+                        <i class="fa-solid fa-exclamation-triangle me-2"></i>Missing Files Report
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="glass-card">
+                <h5 class="mb-3">Department Reports</h5>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-secondary text-start">
+                        <i class="fa-solid fa-building me-2"></i>Department-wise File Distribution
+                    </button>
+                    <button class="btn btn-outline-secondary text-start">
+                        <i class="fa-solid fa-users me-2"></i>Patient File Statistics
+                    </button>
+                    <button class="btn btn-outline-secondary text-start">
+                        <i class="fa-solid fa-chart-pie me-2"></i>File Status Summary
+                    </button>
+                    <button class="btn btn-outline-secondary text-start">
+                        <i class="fa-solid fa-calendar-check me-2"></i>Daily File Activity
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mt-4">
+        <div class="col-md-12">
+            <div class="glass-card">
+                <h5 class="mb-3">Generate Custom Report</h5>
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Report Type</label>
+                            <select class="form-select">
+                                <option value="">Select Report Type</option>
+                                <option value="movement">File Movement</option>
+                                <option value="history">File History</option>
+                                <option value="retention">File Retention</option>
+                                <option value="missing">Missing Files</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">From Date</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">To Date</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">Generate</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mt-4">
+        <div class="col-md-12">
+            <div class="glass-card">
+                <h5 class="mb-3">Export Options</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-file-pdf me-2"></i>Export PDF
+                    </button>
+                    <button class="btn btn-success">
+                        <i class="fa-solid fa-file-excel me-2"></i>Export Excel
+                    </button>
+                    <button class="btn btn-info">
+                        <i class="fa-solid fa-print me-2"></i>Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
