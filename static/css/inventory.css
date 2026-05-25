@@ -1,0 +1,89 @@
+.inventory-wrapper{
+    padding:10px 0;
+    margin-top:0;
+}
+
+.inventory-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.inventory-header h1{
+    font-weight:700;
+}
+
+.stats-card{
+    border-radius:20px;
+    padding:25px;
+    color:white;
+    transition:.4s;
+    animation:fadeUp .6s ease;
+}
+
+.stats-card:hover{
+    transform:translateY(-8px);
+}
+
+.total-card{
+    background:linear-gradient(135deg,#4facfe,#00f2fe);
+}
+
+.low-stock-card{
+    background:linear-gradient(135deg,#ff6b6b,#ff4757);
+}
+
+.supplier-card{
+    background:linear-gradient(135deg,#2ed573,#1dd1a1);
+}
+
+.expiry-card{
+    background:linear-gradient(135deg,#ffa502,#ff6348);
+}
+
+.icon-box{
+    font-size:35px;
+    margin-bottom:15px;
+}
+
+.inventory-form-container{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:120px 20px;
+}
+
+.inventory-form-card{
+    width:100%;
+    max-width:900px;
+    background:white;
+    border-radius:25px;
+    padding:40px;
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+}
+
+.form-control{
+    height:50px;
+    border-radius:12px;
+}
+
+.submit-btn{
+    padding:12px 30px;
+    border-radius:12px;
+}
+
+@keyframes fadeUp{
+
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}

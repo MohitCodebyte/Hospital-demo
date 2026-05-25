@@ -1,0 +1,537 @@
+[
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\doctors_list.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\doctor_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\doctor_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\departments_list.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\department_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\department_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\appointments_list.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\patients_list.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\messages_list.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\emergencies_list.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\analytics\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\analytics\\patients.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\analytics\\appointments.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\analytics\\revenue.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\analytics\\doctors.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\appointment.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\auth\\register.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\auth\\login.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\auth\\admin_login.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\auth\\patient_dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\admin\\settings.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\billing\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\billing\\create_invoice.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\billing\\view_invoice.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\billing\\print_invoice.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\contact.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\departments.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\department_detail.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctor_login.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctor_dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctor_appointment_detail.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\schedule_appointment.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctors.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctor_detail.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctor_patients.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\doctor_appointments.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\emergency.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\analytics\\financial_dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\home.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\about.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\suppliers.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\supplier_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\supplier_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\add_stock_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\add_item.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\edit_item.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\issue_stock_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\items.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\ledger.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\request_stock.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\challans.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\inventory\\challan_reports.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\tests.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\test_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\test_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\orders.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\order_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\enter_results.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\laboratory\\report_print.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\patients.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\patient_profile.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\timeline.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\file_tracking.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\file_form.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\mrd\\mrd_reports.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\notifications\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\notifications\\email_logs.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\checkin.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\queue.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\consultation.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\history.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\fees.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\staff_panel.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\staff_panel.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\staff_panel.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\staff_panel.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\staff_panel.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\opd_slip.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\reception.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\print_slip.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\patient_token.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\opd\\token_success.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\pharmacy\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\pharmacy\\create_medicine.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\pharmacy\\create_purchase.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\pharmacy\\create_issue.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\prescriptions\\index.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\prescriptions\\create.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\prescriptions\\view.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\prescriptions\\edit.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\prescriptions\\patient_history.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\all_reports.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\upload.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\view_report.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\patient_history.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\admin_all_reports.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\reports\\patient_history.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\staff_dashboard.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\staff_appointments.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\superadmin_login.html"
+  },
+  {
+    "action": "exist",
+    "type": "template",
+    "path": "D:\\Intern Project\\Sahara Hospital\\backend\\templates\\superadmin_dashboard.html"
+  }
+]
